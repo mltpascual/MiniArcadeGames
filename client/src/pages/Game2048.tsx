@@ -6,6 +6,7 @@ import { useSoundEngine } from "@/hooks/useSoundEngine";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
 import GameTutorial from "@/components/GameTutorial";
 import { tutorials } from "@/data/tutorialData";
+import ShareScore from "@/components/ShareScore";
 
 const ACCENT_COLOR = "#7C5CFC";
 const GAME_ID = "2048";
@@ -328,11 +329,15 @@ export default function Game2048() {
                     </div>
                 )}
                 {gameState === "over" && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 rounded-lg">
-                        <h2 className="font-pixel text-2xl text-white mb-4">Game Over</h2>
-                        <button onClick={startGame} className="text-white font-bold py-2 px-4 rounded bg-red-500 hover:bg-red-600">
-                            <RotateCcw className="w-8 h-8"/>
-                        </button>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 rounded-lg gap-3">
+                        <h2 className="font-pixel text-2xl text-white mb-2">Game Over</h2>
+                        <p className="font-pixel text-lg text-white">Score: {score}</p>
+                        <div className="flex items-center gap-3">
+                          <button onClick={startGame} className="text-white font-bold py-2 px-4 rounded bg-red-500 hover:bg-red-600">
+                              <RotateCcw className="w-8 h-8"/>
+                          </button>
+                          <ShareScore gameName="2048" score={score} isHighScore={score > highScore} />
+                        </div>
                     </div>
                 )}
             </div>

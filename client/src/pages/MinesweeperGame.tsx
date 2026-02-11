@@ -6,6 +6,7 @@ import { useSoundEngine } from "@/hooks/useSoundEngine";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
 import GameTutorial from "@/components/GameTutorial";
 import { tutorials } from "@/data/tutorialData";
+import ShareScore from "@/components/ShareScore";
 
 const ACCENT_COLOR = "#4ECDC4";
 const GAME_ID = "minesweeper";
@@ -381,7 +382,10 @@ const MinesweeperGame = () => {
           <div className={overlayClasses}>
             <h2 className="text-3xl mb-4 text-red-500">GAME OVER</h2>
             <p className="text-xl mb-4">Score: {score}</p>
-            <Button onClick={() => setGameState("idle")}><RotateCcw className="w-8 h-8" /></Button>
+            <div className="flex items-center gap-3">
+              <Button onClick={() => setGameState("idle")}><RotateCcw className="w-8 h-8" /></Button>
+              <ShareScore gameName="Minesweeper" score={score} />
+            </div>
           </div>
         );
       case "won":
@@ -389,7 +393,10 @@ const MinesweeperGame = () => {
           <div className={overlayClasses}>
             <h2 className="text-3xl mb-4 text-green-400">YOU WIN!</h2>
             <p className="text-xl mb-4">Final Score: {score}</p>
-            <Button onClick={() => setGameState("idle")}><RotateCcw className="w-8 h-8" /></Button>
+            <div className="flex items-center gap-3">
+              <Button onClick={() => setGameState("idle")}><RotateCcw className="w-8 h-8" /></Button>
+              <ShareScore gameName="Minesweeper" score={score} isHighScore={true} />
+            </div>
           </div>
         );
       default:

@@ -10,6 +10,7 @@ import GameLayout from "@/components/GameLayout";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
 import GameTutorial from "@/components/GameTutorial";
+import ShareScore from "@/components/ShareScore";
 import { tutorials } from "@/data/tutorialData";
 
 const ACCENT_COLOR = "#FF6B6B";
@@ -339,9 +340,12 @@ export default function BreakoutGame() {
               <>
                 <h2 className="text-3xl font-bold mb-4">Game Over</h2>
                 <p className="text-xl mb-4">Final Score: {score}</p>
-                <Button onClick={resetGame} size="lg" style={{ backgroundColor: ACCENT_COLOR, color: "white" }}>
-                  <RotateCcw className="mr-2 h-5 w-5" /> Play Again
-                </Button>
+                <div className="flex items-center gap-3">
+                  <Button onClick={resetGame} size="lg" style={{ backgroundColor: ACCENT_COLOR, color: "white" }}>
+                    <RotateCcw className="mr-2 h-5 w-5" /> Play Again
+                  </Button>
+                  <ShareScore gameName="Breakout" score={score} isHighScore={score > highScore} />
+                </div>
               </>
             )}
           </div>

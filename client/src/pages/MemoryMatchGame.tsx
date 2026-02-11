@@ -11,6 +11,7 @@ import GameLayout from "@/components/GameLayout";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
 import GameTutorial from "@/components/GameTutorial";
+import ShareScore from "@/components/ShareScore";
 import { tutorials } from "@/data/tutorialData";
 
 const ACCENT_COLOR = "#FF6B6B";
@@ -347,9 +348,12 @@ export default function MemoryMatchGame() {
               <>
                 <h2 className="text-3xl font-bold mb-2">Game Over!</h2>
                 <p className="text-lg mb-4">Final Score: {score}</p>
-                <Button onClick={startGame} style={{ backgroundColor: ACCENT_COLOR }} className="text-white">
-                  <RotateCcw className="mr-2 h-4 w-4" /> Play Again
-                </Button>
+                <div className="flex items-center gap-3">
+                  <Button onClick={startGame} style={{ backgroundColor: ACCENT_COLOR }} className="text-white">
+                    <RotateCcw className="mr-2 h-4 w-4" /> Play Again
+                  </Button>
+                  <ShareScore gameName="Memory Match" score={score} extraDetail={`${moves} moves`} isHighScore={score > highScore} />
+                </div>
               </>
             )}
           </div>

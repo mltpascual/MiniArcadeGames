@@ -41,3 +41,4 @@
 - [x] Favorites filter tab on homepage for logged-in users
 - [x] Animated NEW/HOT badges on game cards based on leaderboard data
 - [x] Reset Tutorial option in Settings page
+- [x] Social sharing button on game-over screens (Twitter/X, Facebook, copy link) for all 11 games

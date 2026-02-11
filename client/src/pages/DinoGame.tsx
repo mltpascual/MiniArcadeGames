@@ -8,6 +8,7 @@ import GameLayout from "@/components/GameLayout";
 import { Button } from "@/components/ui/button";
 import { Play, RotateCcw, Trophy, ArrowUp, ArrowDown, Pause } from "lucide-react";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
+import ShareScore from "@/components/ShareScore";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
 import GameTutorial from "@/components/GameTutorial";
@@ -557,12 +558,15 @@ export default function DinoGame() {
             {score >= highScore && score > 0 && (
               <p className="font-pixel text-xs sm:text-sm text-arcade-mint animate-pulse">NEW HIGH SCORE!</p>
             )}
-            <Button
-              onClick={startGame}
-              className="bg-arcade-indigo text-white hover:bg-arcade-indigo/90 font-pixel text-xs sm:text-sm gap-2"
-            >
-              <RotateCcw className="w-4 h-4" /> RETRY
-            </Button>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Button
+                onClick={startGame}
+                className="bg-arcade-indigo text-white hover:bg-arcade-indigo/90 font-pixel text-xs sm:text-sm gap-2"
+              >
+                <RotateCcw className="w-4 h-4" /> RETRY
+              </Button>
+              <ShareScore gameName="Dino Jump" score={score} isHighScore={score >= highScore && score > 0} />
+            </div>
           </div>
         )}
       </div>

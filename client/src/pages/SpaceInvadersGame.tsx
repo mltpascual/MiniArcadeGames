@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Play, RotateCcw, Trophy, ChevronLeft, ChevronRight, Crosshair, Pause } from "lucide-react";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
+import ShareScore from "@/components/ShareScore";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 import GameTutorial from "@/components/GameTutorial";
 import { tutorials } from "@/data/tutorialData";
@@ -589,9 +590,12 @@ export default function SpaceInvadersGame() {
               {score >= highScore && score > 0 && (
                 <p className="font-pixel text-xs sm:text-sm text-arcade-mint animate-pulse">NEW HIGH SCORE!</p>
               )}
-              <Button onClick={startGame} className="bg-arcade-indigo text-white hover:bg-arcade-indigo/90 font-pixel text-xs sm:text-sm gap-2">
-                <RotateCcw className="w-4 h-4" /> RETRY
-              </Button>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Button onClick={startGame} className="bg-arcade-indigo text-white hover:bg-arcade-indigo/90 font-pixel text-xs sm:text-sm gap-2">
+                  <RotateCcw className="w-4 h-4" /> RETRY
+                </Button>
+                <ShareScore gameName="Space Invaders" score={score} extraDetail={`Wave ${wave}`} isHighScore={score >= highScore && score > 0} />
+              </div>
             </div>
           )}
         </div>

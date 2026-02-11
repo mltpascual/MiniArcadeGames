@@ -6,6 +6,7 @@ import { useSoundEngine } from "@/hooks/useSoundEngine";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
 import GameTutorial from "@/components/GameTutorial";
 import { tutorials } from "@/data/tutorialData";
+import ShareScore from "@/components/ShareScore";
 
 const ACCENT_COLOR = "#4ECDC4";
 const GAME_ID = "whack-a-mole";
@@ -328,9 +329,12 @@ export default function WhackAMoleGame() {
           <div className={overlayClasses}>
             <h2 className="text-3xl font-bold mb-2 text-red-500">Game Over</h2>
             <p className="text-xl text-white mb-4">Final Score: {score}</p>
-            <Button onClick={startGame} size="lg">
-              <RotateCcw className="mr-2 h-5 w-5" /> Play Again
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button onClick={startGame} size="lg">
+                <RotateCcw className="mr-2 h-5 w-5" /> Play Again
+              </Button>
+              <ShareScore gameName="Whack-a-Mole" score={score} isHighScore={score > highScore} />
+            </div>
           </div>
         );
       default: return null;

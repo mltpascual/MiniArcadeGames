@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Play, RotateCcw, Trophy, Pause } from "lucide-react";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
+import ShareScore from "@/components/ShareScore";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 import GameTutorial from "@/components/GameTutorial";
 import { tutorials } from "@/data/tutorialData";
@@ -410,9 +411,12 @@ export default function PongGame() {
                 {winner === "player" ? "YOU WIN!" : "CPU WINS"}
               </h2>
               <p className="font-pixel text-base sm:text-lg text-white">{playerScore} - {aiScore}</p>
-              <Button onClick={startGame} className="bg-arcade-mint text-arcade-darker hover:bg-arcade-mint/90 font-pixel text-xs sm:text-sm gap-2">
-                <RotateCcw className="w-4 h-4" /> REMATCH
-              </Button>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Button onClick={startGame} className="bg-arcade-mint text-arcade-darker hover:bg-arcade-mint/90 font-pixel text-xs sm:text-sm gap-2">
+                  <RotateCcw className="w-4 h-4" /> REMATCH
+                </Button>
+                <ShareScore gameName="Pong" score={playerScore} extraDetail={`${playerScore}-${aiScore} vs CPU`} isHighScore={winner === "player"} />
+              </div>
             </div>
           )}
         </div>
