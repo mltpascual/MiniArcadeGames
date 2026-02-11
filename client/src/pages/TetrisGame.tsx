@@ -6,7 +6,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import GameLayout from "@/components/GameLayout";
 import { Button } from "@/components/ui/button";
-import { Play, RotateCcw, Trophy, RotateCw, ChevronDown, ChevronLeft, ChevronRight, ChevronsDown } from "lucide-react";
+import { Play, RotateCcw, Trophy, RotateCw, ChevronDown, ChevronLeft, ChevronRight, ChevronsDown, Pause } from "lucide-react";
+import { useScoreSubmit } from "@/hooks/useScoreSubmit";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 
@@ -62,7 +63,8 @@ export default function TetrisGame() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nextCanvasRef = useRef<HTMLCanvasElement>(null);
-  const [gameState, setGameState] = useState<"idle" | "playing" | "over">("idle");
+  const [gameState, setGameState] = useState<"idle" | "playing" | "paused" | "over">("idle");
+  const { submitScore } = useScoreSubmit();
   const [score, setScore] = useState(0);
   const [lines, setLines] = useState(0);
   const [level, setLevel] = useState(1);
@@ -119,6 +121,7 @@ export default function TetrisGame() {
               setHighScore(final);
               localStorage.setItem("tetris-highscore", String(final));
             }
+            submitScore({ game: "tetris", score: final, lines: linesRef.current });
             return;
           }
           board[ny][nx] = piece.color;
@@ -162,8 +165,9 @@ export default function TetrisGame() {
         setHighScore(final);
         localStorage.setItem("tetris-highscore", String(final));
       }
+      submitScore({ game: "tetris", score: final, lines: linesRef.current });
     }
-  }, [collides, highScore, playSound, stopMusic]);
+  }, [collides, highScore, playSound, stopMusic, submitScore]);
 
   const moveLeft = useCallback(() => {
     const piece = pieceRef.current;
@@ -355,6 +359,17 @@ export default function TetrisGame() {
     startMusic();
   }, [playSound, startMusic]);
 
+  const togglePause = useCallback(() => {
+    if (gameState === "playing") {
+      setGameState("paused");
+      stopMusic();
+    } else if (gameState === "paused") {
+      setGameState("playing");
+      lastTickRef.current = 0;
+      startMusic();
+    }
+  }, [gameState, stopMusic, startMusic]);
+
   useEffect(() => {
     if (gameState === "playing") {
       gameLoopRef.current = requestAnimationFrame(gameLoop);
@@ -366,6 +381,12 @@ export default function TetrisGame() {
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.key === "p" || e.key === "P") {
+        e.preventDefault();
+        if (gameState === "playing" || gameState === "paused") togglePause();
+        return;
+      }
+      if (gameState === "paused") return;
       if (gameState !== "playing") {
         if (e.key === " " || e.key === "Enter") { e.preventDefault(); startGame(); }
         return;
@@ -380,7 +401,7 @@ export default function TetrisGame() {
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [gameState, startGame, moveLeft, moveRight, moveDown, rotatePiece, hardDrop]);
+  }, [gameState, startGame, moveLeft, moveRight, moveDown, rotatePiece, hardDrop, togglePause]);
 
   useEffect(() => {
     if (gameState === "idle") draw();
@@ -428,6 +449,16 @@ export default function TetrisGame() {
                 </p>
                 <Button onClick={startGame} className="bg-arcade-coral text-white hover:bg-arcade-coral/90 font-pixel text-xs sm:text-sm gap-2">
                   <Play className="w-4 h-4" /> START
+                </Button>
+              </div>
+            )}
+
+            {gameState === "paused" && (
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center gap-3 sm:gap-4">
+                <h2 className="font-pixel text-xl sm:text-2xl text-arcade-coral text-glow-coral">PAUSED</h2>
+                <p className="text-xs sm:text-sm text-white/70">Press ESC or P to resume</p>
+                <Button onClick={togglePause} className="bg-arcade-coral text-white hover:bg-arcade-coral/90 font-pixel text-xs sm:text-sm gap-2">
+                  <Play className="w-4 h-4" /> RESUME
                 </Button>
               </div>
             )}
@@ -503,8 +534,19 @@ export default function TetrisGame() {
           </Button>
         </div>
 
+        {/* Pause button for mobile */}
+        {gameState === "playing" && (
+          <Button
+            variant="outline"
+            className="mt-1 border-arcade-coral/30 text-arcade-coral font-pixel text-xs sm:hidden gap-1"
+            onClick={togglePause}
+          >
+            <Pause className="w-4 h-4" /> PAUSE
+          </Button>
+        )}
+
         <p className="text-[10px] sm:text-xs text-muted-foreground text-center hidden sm:block">
-          ← → Move · ↑ Rotate · ↓ Soft Drop · Space Hard Drop
+          ← → Move · ↑ Rotate · ↓ Soft Drop · Space Hard Drop · P Pause
         </p>
       </div>
     </GameLayout>

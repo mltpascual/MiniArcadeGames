@@ -6,7 +6,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import GameLayout from "@/components/GameLayout";
 import { Button } from "@/components/ui/button";
-import { Play, RotateCcw, Trophy, ChevronLeft, ChevronRight, Crosshair } from "lucide-react";
+import { Play, RotateCcw, Trophy, ChevronLeft, ChevronRight, Crosshair, Pause } from "lucide-react";
+import { useScoreSubmit } from "@/hooks/useScoreSubmit";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 
@@ -36,7 +37,8 @@ export default function SpaceInvadersGame() {
   const { playSound, startMusic, stopMusic } = useSoundEngine();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [gameState, setGameState] = useState<"idle" | "playing" | "over">("idle");
+  const [gameState, setGameState] = useState<"idle" | "playing" | "paused" | "over">("idle");
+  const { submitScore } = useScoreSubmit();
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [wave, setWave] = useState(1);
@@ -363,6 +365,7 @@ export default function SpaceInvadersGame() {
             setHighScore(final);
             localStorage.setItem("invaders-highscore", String(final));
           }
+          submitScore({ game: "space-invaders", score: final, wave: waveRef.current });
         }
         return false;
       }
@@ -380,6 +383,7 @@ export default function SpaceInvadersGame() {
           setHighScore(final);
           localStorage.setItem("invaders-highscore", String(final));
         }
+        submitScore({ game: "space-invaders", score: final, wave: waveRef.current });
         break;
       }
     }
@@ -433,6 +437,16 @@ export default function SpaceInvadersGame() {
     startMusic();
   }, [initAliens, playSound, startMusic]);
 
+  const togglePause = useCallback(() => {
+    if (gameState === "playing") {
+      setGameState("paused");
+      stopMusic();
+    } else if (gameState === "paused") {
+      setGameState("playing");
+      startMusic();
+    }
+  }, [gameState, stopMusic, startMusic]);
+
   useEffect(() => {
     if (gameState === "playing") {
       gameLoopRef.current = requestAnimationFrame(gameLoop);
@@ -444,6 +458,12 @@ export default function SpaceInvadersGame() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.key === "p" || e.key === "P") {
+        e.preventDefault();
+        if (gameState === "playing" || gameState === "paused") togglePause();
+        return;
+      }
+      if (gameState === "paused") return;
       if (gameState !== "playing") {
         if (e.key === " " || e.key === "Enter") { e.preventDefault(); startGame(); }
         return;
@@ -460,7 +480,7 @@ export default function SpaceInvadersGame() {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [gameState, startGame]);
+  }, [gameState, startGame, togglePause]);
 
   useEffect(() => {
     if (gameState === "idle") draw();
@@ -548,6 +568,16 @@ export default function SpaceInvadersGame() {
             </div>
           )}
 
+          {gameState === "paused" && (
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center gap-3 sm:gap-4">
+              <h2 className="font-pixel text-xl sm:text-2xl text-arcade-indigo text-glow-indigo">PAUSED</h2>
+              <p className="text-xs sm:text-sm text-white/70">Press ESC or P to resume</p>
+              <Button onClick={togglePause} className="bg-arcade-indigo text-white hover:bg-arcade-indigo/90 font-pixel text-xs sm:text-sm gap-2">
+                <Play className="w-4 h-4" /> RESUME
+              </Button>
+            </div>
+          )}
+
           {gameState === "over" && (
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-3 sm:gap-4">
               <h2 className="font-pixel text-xl sm:text-2xl text-arcade-coral text-glow-coral">GAME OVER</h2>
@@ -594,8 +624,19 @@ export default function SpaceInvadersGame() {
           </Button>
         </div>
 
+        {/* Pause button for mobile */}
+        {gameState === "playing" && (
+          <Button
+            variant="outline"
+            className="mt-1 border-arcade-indigo/30 text-arcade-indigo font-pixel text-xs sm:hidden gap-1"
+            onClick={togglePause}
+          >
+            <Pause className="w-4 h-4" /> PAUSE
+          </Button>
+        )}
+
         <p className="text-[10px] sm:text-xs text-muted-foreground text-center hidden sm:block">
-          ← → Move · Space Shoot · Survive the alien waves!
+          ← → Move · Space Shoot · P Pause · Survive the alien waves!
         </p>
       </div>
     </GameLayout>

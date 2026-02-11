@@ -6,7 +6,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import GameLayout from "@/components/GameLayout";
 import { Button } from "@/components/ui/button";
-import { Play, RotateCcw, Trophy } from "lucide-react";
+import { Play, RotateCcw, Trophy, Pause } from "lucide-react";
+import { useScoreSubmit } from "@/hooks/useScoreSubmit";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 
@@ -37,7 +38,8 @@ export default function PongGame() {
   const { playSound, startMusic, stopMusic } = useSoundEngine();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [gameState, setGameState] = useState<"idle" | "playing" | "over">("idle");
+  const [gameState, setGameState] = useState<"idle" | "playing" | "paused" | "over">("idle");
+  const { submitScore } = useScoreSubmit();
   const [playerScore, setPlayerScore] = useState(0);
   const [aiScore, setAiScore] = useState(0);
   const [winner, setWinner] = useState<"player" | "ai" | null>(null);
@@ -219,6 +221,7 @@ export default function PongGame() {
         playSound("gameOver");
         stopMusic();
         setGameState("over");
+        submitScore({ game: "pong", score: pScoreRef.current, extras: { playerScore: pScoreRef.current, aiScore: aScoreRef.current } });
         return;
       }
       resetBall(1);
@@ -235,6 +238,7 @@ export default function PongGame() {
         playSound("levelUp");
         stopMusic();
         setGameState("over");
+        submitScore({ game: "pong", score: pScoreRef.current, extras: { playerScore: pScoreRef.current, aiScore: aScoreRef.current } });
         return;
       }
       resetBall(-1);
@@ -265,6 +269,16 @@ export default function PongGame() {
     startMusic();
   }, [resetBall, playSound, startMusic]);
 
+  const togglePause = useCallback(() => {
+    if (gameState === "playing") {
+      setGameState("paused");
+      stopMusic();
+    } else if (gameState === "paused") {
+      setGameState("playing");
+      startMusic();
+    }
+  }, [gameState, stopMusic, startMusic]);
+
   useEffect(() => {
     if (gameState === "playing") {
       gameLoopRef.current = requestAnimationFrame(gameLoop);
@@ -276,6 +290,12 @@ export default function PongGame() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.key === "p" || e.key === "P") {
+        e.preventDefault();
+        if (gameState === "playing" || gameState === "paused") togglePause();
+        return;
+      }
+      if (gameState === "paused") return;
       if (gameState !== "playing") {
         if (e.key === " " || e.key === "Enter") { e.preventDefault(); startGame(); }
         return;
@@ -292,7 +312,7 @@ export default function PongGame() {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [gameState, startGame]);
+  }, [gameState, startGame, togglePause]);
 
   // Touch controls — drag to move paddle
   useEffect(() => {
@@ -371,6 +391,16 @@ export default function PongGame() {
             </div>
           )}
 
+          {gameState === "paused" && (
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center gap-3 sm:gap-4">
+              <h2 className="font-pixel text-xl sm:text-2xl text-arcade-mint text-glow-mint">PAUSED</h2>
+              <p className="text-xs sm:text-sm text-white/70">Press ESC or P to resume</p>
+              <Button onClick={togglePause} className="bg-arcade-mint text-arcade-darker hover:bg-arcade-mint/90 font-pixel text-xs sm:text-sm gap-2">
+                <Play className="w-4 h-4" /> RESUME
+              </Button>
+            </div>
+          )}
+
           {gameState === "over" && (
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-3 sm:gap-4">
               <h2 className={`font-pixel text-xl sm:text-2xl ${winner === "player" ? "text-arcade-mint text-glow-mint" : "text-arcade-coral text-glow-coral"}`}>
@@ -384,8 +414,19 @@ export default function PongGame() {
           )}
         </div>
 
-        <p className="text-[10px] sm:text-xs text-muted-foreground text-center">
-          ↑↓ or W/S to move paddle · Touch and drag on mobile · First to {WIN_SCORE} wins
+        {/* Pause button for mobile */}
+        {gameState === "playing" && (
+          <Button
+            variant="outline"
+            className="mt-2 border-arcade-mint/30 text-arcade-mint font-pixel text-xs sm:hidden gap-1"
+            onClick={togglePause}
+          >
+            <Pause className="w-4 h-4" /> PAUSE
+          </Button>
+        )}
+
+        <p className="text-[10px] sm:text-xs text-muted-foreground text-center hidden sm:block">
+          ↑↓ or W/S to move paddle · P to pause · First to {WIN_SCORE} wins
         </p>
       </div>
     </GameLayout>

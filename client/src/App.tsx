@@ -13,8 +13,10 @@ import TetrisGame from "./pages/TetrisGame";
 import PongGame from "./pages/PongGame";
 import SpaceInvadersGame from "./pages/SpaceInvadersGame";
 import Settings from "./pages/Settings";
-
+import Leaderboard from "./pages/Leaderboard";
+import Achievements from "./pages/Achievements";
 function Router() {
+  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
@@ -25,6 +27,8 @@ function Router() {
       <Route path={"/pong"} component={PongGame} />
       <Route path={"/space-invaders"} component={SpaceInvadersGame} />
       <Route path={"/settings"} component={Settings} />
+      <Route path={"/leaderboard"} component={Leaderboard} />
+      <Route path={"/achievements"} component={Achievements} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
