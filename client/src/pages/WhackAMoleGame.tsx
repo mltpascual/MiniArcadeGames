@@ -260,7 +260,7 @@ export default function WhackAMoleGame() {
     const resizeCanvas = () => {
       const container = canvas.parentElement;
       if (container) {
-        const size = Math.min(container.clientWidth, 400);
+        const size = Math.min(container.clientWidth, 700);
         canvas.width = size;
         canvas.height = size;
         draw();
@@ -349,7 +349,7 @@ export default function WhackAMoleGame() {
           </button>
         )}
       </div>
-      <div className="relative w-full max-w-[400px] aspect-square">
+      <div className="relative w-full max-w-[700px] aspect-square">
         <canvas
           ref={canvasRef}
           className="w-full h-full rounded-lg shadow-lg"

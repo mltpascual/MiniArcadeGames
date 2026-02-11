@@ -376,7 +376,7 @@ export default function PongGame() {
             width={CANVAS_W}
             height={CANVAS_H}
             className="game-canvas block"
-            style={{ width: `min(${CANVAS_W}px, calc(100vw - 2rem))`, height: "auto", aspectRatio: `${CANVAS_W}/${CANVAS_H}` }}
+            style={{ width: `min(calc((100vh - 14rem) * ${CANVAS_W} / ${CANVAS_H}), calc(100vw - 2rem), 800px)`, height: "auto", aspectRatio: `${CANVAS_W}/${CANVAS_H}` }}
           />
 
           {gameState === "idle" && (

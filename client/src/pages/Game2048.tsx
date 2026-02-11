@@ -183,7 +183,7 @@ export default function Game2048() {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        const size = Math.min(canvas.width, 400);
+        const size = Math.min(canvas.width, 700);
         const TILE_SIZE = size / 4 * 0.85;
         const TILE_GAP = size / 4 * 0.15;
 
@@ -242,7 +242,7 @@ export default function Game2048() {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const handleResize = () => {
-            const size = Math.min(window.innerWidth * 0.9, 400);
+            const size = Math.min(window.innerWidth * 0.9, 700);
             canvas.width = size;
             canvas.height = size;
             draw();
@@ -307,7 +307,7 @@ export default function Game2048() {
                     </button>
                 )}
             </div>
-            <div className="relative w-full max-w-[400px] aspect-square">
+            <div className="relative w-full max-w-[700px] aspect-square">
                 <canvas ref={canvasRef} className="rounded-lg bg-[#34344a] w-full h-full" />
                 {gameState === "idle" && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 rounded-lg">

@@ -348,7 +348,7 @@ export default function FlappyBirdGame() {
             e.preventDefault();
             if (gameState === "playing") flap();
           }}
-          style={{ width: `min(${CANVAS_W}px, calc(100vw - 2rem))`, height: "auto", aspectRatio: `${CANVAS_W}/${CANVAS_H}` }}
+          style={{ width: `min(calc((100vh - 14rem) * ${CANVAS_W} / ${CANVAS_H}), calc(100vw - 2rem), 500px)`, height: "auto", aspectRatio: `${CANVAS_W}/${CANVAS_H}` }}
         />
 
         {/* Overlay states */}

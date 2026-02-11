@@ -376,7 +376,7 @@ export default function SnakeGame() {
           width={CANVAS_W}
           height={CANVAS_H}
           className="game-canvas block"
-          style={{ width: `min(${CANVAS_W}px, calc(100vw - 2rem))`, height: "auto", aspectRatio: `${CANVAS_W}/${CANVAS_H}` }}
+          style={{ width: `min(calc(100vh - 14rem), calc(100vw - 2rem), 600px)`, height: "auto", aspectRatio: `${CANVAS_W}/${CANVAS_H}` }}
         />
 
         {/* Overlay states */}

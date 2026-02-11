@@ -515,7 +515,7 @@ export default function DinoGame() {
             e.preventDefault();
             if (gameState === "playing") jump();
           }}
-          style={{ width: `min(${CANVAS_W}px, calc(100vw - 2rem))`, height: "auto", aspectRatio: `${CANVAS_W}/${CANVAS_H}` }}
+          style={{ width: `min(calc(100vw - 2rem), 900px)`, height: "auto", aspectRatio: `${CANVAS_W}/${CANVAS_H}` }}
         />
 
         {/* Overlay states */}

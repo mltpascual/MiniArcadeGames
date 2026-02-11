@@ -31,3 +31,4 @@
 - [x] Homepage updated with 11 game cards
 - [x] Achievements for new games
 - [x] Routes and navigation for all new games
+- [x] Fix game canvas too small on desktop — make games fill more screen space

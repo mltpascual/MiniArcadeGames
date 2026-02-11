@@ -301,7 +301,7 @@ export default function BreakoutGame() {
           </button>
         )}
       </div>
-      <div className="relative w-full max-w-[400px] aspect-[4/5] bg-[#0d0d1a] rounded-lg overflow-hidden shadow-lg border-2 border-gray-600">
+      <div className="relative w-full max-w-[700px] aspect-[4/5] bg-[#0d0d1a] rounded-lg overflow-hidden shadow-lg border-2 border-gray-600">
         <canvas
           ref={canvasRef}
           width={CANVAS_WIDTH}
@@ -344,7 +344,7 @@ export default function BreakoutGame() {
           </div>
         )}
       </div>
-       <div className="sm:hidden w-full max-w-[400px] mt-4 flex justify-between gap-2">
+       <div className="sm:hidden w-full max-w-[700px] mt-4 flex justify-between gap-2">
          <div className="text-xs text-gray-400 text-center">
             <p>Move paddle with mouse, arrow keys, or touch.</p>
             <p>Press 'P' or 'Esc' to pause.</p>

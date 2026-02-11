@@ -248,7 +248,7 @@ export default function MemoryMatchGame() {
   useEffect(() => {
     const handleResize = () => {
       const screenWidth = window.innerWidth;
-      const size = Math.min(400, screenWidth - 20);
+      const size = Math.min(700, screenWidth - 20);
       setCanvasSize({ width: size, height: size });
       shuffleAndDeal();
     };
