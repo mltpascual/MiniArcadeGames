@@ -17,3 +17,8 @@
 - [x] Push database schema with leaderboard and achievements tables
 - [x] Score submission integration in all 6 games
 - [x] Vitest tests for achievements logic
+- [x] User profile page with player stats dashboard
+- [x] Game history section showing recent scores per game
+- [x] Unlocked achievements display on profile
+- [x] Backend API endpoints for profile data (stats, history)
+- [x] Profile link in navigation (homepage + game pages)

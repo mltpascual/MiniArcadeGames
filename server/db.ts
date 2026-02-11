@@ -182,3 +182,51 @@ export async function getUserAchievements(userId: number) {
     .where(eq(achievements.userId, userId))
     .orderBy(desc(achievements.unlockedAt));
 }
+
+// ─── Profile Queries ───
+
+/** Get recent score history for a user (all games, newest first) */
+export async function getUserRecentScores(userId: number, limit = 30) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select({
+      id: scores.id,
+      game: scores.game,
+      score: scores.score,
+      wave: scores.wave,
+      lines: scores.lines,
+      createdAt: scores.createdAt,
+    })
+    .from(scores)
+    .where(eq(scores.userId, userId))
+    .orderBy(desc(scores.createdAt))
+    .limit(limit);
+}
+
+/** Get total number of games played by a user */
+export async function getUserTotalGamesPlayed(userId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+  const result = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(scores)
+    .where(eq(scores.userId, userId));
+  return result[0]?.count ?? 0;
+}
+
+/** Get the user's best score per game along with total plays per game */
+export async function getUserGameStats(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select({
+      game: scores.game,
+      bestScore: sql<number>`MAX(${scores.score})`,
+      totalPlays: sql<number>`COUNT(*)`,
+      lastPlayed: sql<Date>`MAX(${scores.createdAt})`,
+    })
+    .from(scores)
+    .where(eq(scores.userId, userId))
+    .groupBy(scores.game);
+}

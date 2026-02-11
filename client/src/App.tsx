@@ -15,6 +15,7 @@ import SpaceInvadersGame from "./pages/SpaceInvadersGame";
 import Settings from "./pages/Settings";
 import Leaderboard from "./pages/Leaderboard";
 import Achievements from "./pages/Achievements";
+import Profile from "./pages/Profile";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -29,6 +30,7 @@ function Router() {
       <Route path={"/settings"} component={Settings} />
       <Route path={"/leaderboard"} component={Leaderboard} />
       <Route path={"/achievements"} component={Achievements} />
+      <Route path={"/profile"} component={Profile} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

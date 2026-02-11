@@ -10,6 +10,9 @@ import {
   getUserAllBestScores,
   unlockAchievement,
   getUserAchievements,
+  getUserRecentScores,
+  getUserTotalGamesPlayed,
+  getUserGameStats,
 } from "./db";
 import { checkAchievements } from "../shared/achievements";
 
@@ -105,6 +108,41 @@ export const appRouter = router({
         return { unlocked: isNew, achievementId: "all-games" };
       }
       return { unlocked: false, gamesPlayed: gamesPlayed.size };
+    }),
+  }),
+
+  profile: router({
+    /** Get the current user's full profile data (stats, game history, achievements) */
+    getMyProfile: protectedProcedure.query(async ({ ctx }) => {
+      const [gameStats, recentScores, totalGamesPlayed, achievements, bestScores] = await Promise.all([
+        getUserGameStats(ctx.user.id),
+        getUserRecentScores(ctx.user.id, 30),
+        getUserTotalGamesPlayed(ctx.user.id),
+        getUserAchievements(ctx.user.id),
+        getUserAllBestScores(ctx.user.id),
+      ]);
+
+      // Calculate aggregate stats
+      const totalScore = bestScores.reduce((sum, s) => sum + (s.score ?? 0), 0);
+      const gamesWithScores = bestScores.length;
+
+      return {
+        user: {
+          id: ctx.user.id,
+          name: ctx.user.name,
+          email: ctx.user.email,
+          createdAt: ctx.user.createdAt,
+        },
+        stats: {
+          totalGamesPlayed,
+          gamesWithScores,
+          totalBestScore: totalScore,
+          achievementsUnlocked: achievements.length,
+        },
+        gameStats,
+        recentScores,
+        achievements,
+      };
     }),
   }),
 });

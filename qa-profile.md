@@ -1,0 +1,3 @@
+# QA Notes - Profile Page
+
+The profile page renders correctly when logged in (as Miguel Pascual). It shows the player header with avatar initial, name, and join date. The Overview section displays 4 stat cards (Games Played, Games Tried, Total Best Score, Achievements). The Game Stats section shows an empty state with "Play Now" button. The Achievements section shows 0/20 progress bar and empty state. The Recent Games section shows empty state. The page is currently in light theme. The nav bar has Back, Settings, and Sign Out buttons. The Profile icon is visible in the homepage nav bar. All sections are properly laid out and responsive. Zero TypeScript errors, 30 vitest tests passing.

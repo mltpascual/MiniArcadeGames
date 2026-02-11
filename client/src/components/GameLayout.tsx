@@ -3,7 +3,7 @@
  * Provides consistent nav, back button, and game container styling
  */
 import { Link } from "wouter";
-import { ArrowLeft, Gamepad2, Home, Settings, Trophy } from "lucide-react";
+import { ArrowLeft, Gamepad2, Home, Settings, Trophy, User } from "lucide-react";
 
 interface GameLayoutProps {
   title: string;
@@ -56,6 +56,11 @@ export default function GameLayout({ title, color, children }: GameLayoutProps) 
             <Link href="/leaderboard">
               <div className="w-7 h-7 rounded-md border border-border/50 flex items-center justify-center text-muted-foreground hover:text-yellow-400 hover:border-yellow-400/30 transition-colors" title="Leaderboard">
                 <Trophy className="w-3.5 h-3.5" />
+              </div>
+            </Link>
+            <Link href="/profile">
+              <div className="w-7 h-7 rounded-md border border-border/50 flex items-center justify-center text-muted-foreground hover:text-arcade-indigo hover:border-arcade-indigo/30 transition-colors" title="Profile">
+                <User className="w-3.5 h-3.5" />
               </div>
             </Link>
             <Link href="/settings">

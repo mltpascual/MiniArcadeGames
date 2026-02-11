@@ -8,7 +8,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { Gamepad2, Zap, Settings, Trophy, Award } from "lucide-react";
+import { Gamepad2, Zap, Settings, Trophy, Award, User } from "lucide-react";
 
 const HERO_IMG = "https://private-us-east-1.manuscdn.com/sessionFile/47LZSGYqN22BYCYAxPiaxL/sandbox/2gvGaXiIcbq5AtvP2rclMh-img-1_1770800508000_na1fn_aGVyby1hcmNhZGU.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvNDdMWlNHWXFOMjJCWUNZQXhQaWF4TC9zYW5kYm94LzJndkdhWGlJY2JxNUF0dlAycmNsTWgtaW1nLTFfMTc3MDgwMDUwODAwMF9uYTFmbl9hR1Z5YnkxaGNtTmhaR1UucG5nP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTkyMCxoXzE5MjAvZm9ybWF0LHdlYnAvcXVhbGl0eSxxXzgwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=nTbEBvwm5ChOvub7wedCQMyEBwIAY9Yq6ObAudIcHubjRSNUGOF89zeR6Ao20c7Er100ntL-zXZOOBUy1NhIx9AHVwmtCye7YSJZ2Jo4SQuAdgY5O~H6Mo08PhHf8Eebxu8v33ynfQggloMlk9cDoxQKd4nmxE-0lApXya4BsIaiy56QlGU0NZotn189Odye82Zs14FwXhx6b6EcqLXBuS-LlrJhVPrJcIk8BpOT4TWAV~uHebM-cDwvwqZb~BrmrbN7EMHoLTv4IB5hM9BVeOr10e96vW3uVOaaBboj5-PJ4W49jCIfBD3L7tOnljZDcPt0fLvP3dLXbfaS5JJTFg__";
 
@@ -189,6 +189,11 @@ export default function Home() {
             <Link href="/achievements">
               <div className="w-8 h-8 rounded-lg border border-border/50 flex items-center justify-center text-muted-foreground hover:text-arcade-mint hover:border-arcade-mint/30 transition-colors" title="Achievements">
                 <Award className="w-4 h-4" />
+              </div>
+            </Link>
+            <Link href="/profile">
+              <div className="w-8 h-8 rounded-lg border border-border/50 flex items-center justify-center text-muted-foreground hover:text-arcade-indigo hover:border-arcade-indigo/30 transition-colors" title="Profile">
+                <User className="w-4 h-4" />
               </div>
             </Link>
             <Link href="/settings">
