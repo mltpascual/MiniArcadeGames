@@ -45,12 +45,14 @@ export default function MemoryMatchGame() {
   const [moves, setMoves] = useState(0);
   const [pairsFound, setPairsFound] = useState(0);
   const [cards, setCards] = useState<Card[]>([]);
-  const [canvasSize, setCanvasSize] = useState({ width: 400, height: 400 });
+  const [canvasSize, setCanvasSize] = useState({ width: Math.min(700, window.innerWidth - 20), height: Math.min(700, window.innerWidth - 20) });
 
   const gameLoopRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
   const flippedCardsRef = useRef<Card[]>([]);
   const isCheckingRef = useRef(false);
+  const canvasSizeRef = useRef(canvasSize);
+  canvasSizeRef.current = canvasSize;
 
   useEffect(() => {
     const storedHighScore = localStorage.getItem(HIGH_SCORE_KEY);
@@ -59,12 +61,13 @@ export default function MemoryMatchGame() {
     }
   }, []);
 
-  const shuffleAndDeal = useCallback(() => {
+  const shuffleAndDeal = useCallback((size?: { width: number; height: number }) => {
+    const s = size || canvasSizeRef.current;
     const symbols = [...EMOJIS, ...EMOJIS];
     symbols.sort(() => Math.random() - 0.5);
 
-    const cardWidth = canvasSize.width / GRID_SIZE;
-    const cardHeight = canvasSize.height / GRID_SIZE;
+    const cardWidth = s.width / GRID_SIZE;
+    const cardHeight = s.height / GRID_SIZE;
 
     const newCards = symbols.map((emoji, index) => {
       const row = Math.floor(index / GRID_SIZE);
@@ -83,7 +86,7 @@ export default function MemoryMatchGame() {
       };
     });
     setCards(newCards);
-  }, [canvasSize]);
+  }, []);
 
   const startGame = () => {
     shuffleAndDeal();
@@ -249,14 +252,17 @@ export default function MemoryMatchGame() {
     const handleResize = () => {
       const screenWidth = window.innerWidth;
       const size = Math.min(700, screenWidth - 20);
-      setCanvasSize({ width: size, height: size });
-      shuffleAndDeal();
+      const newSize = { width: size, height: size };
+      setCanvasSize(newSize);
+      if (gameState === "idle") {
+        shuffleAndDeal(newSize);
+      }
     };
 
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [shuffleAndDeal]);
+  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
