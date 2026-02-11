@@ -47,3 +47,16 @@ export const achievements = mysqlTable("achievements", {
 
 export type Achievement = typeof achievements.$inferSelect;
 export type InsertAchievement = typeof achievements.$inferInsert;
+
+/**
+ * User favorites — tracks which games each user has favorited.
+ */
+export const favorites = mysqlTable("favorites", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  gameId: varchar("gameId", { length: 32 }).notNull(), // e.g. "snake", "tetris"
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Favorite = typeof favorites.$inferSelect;
+export type InsertFavorite = typeof favorites.$inferInsert;

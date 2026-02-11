@@ -4,7 +4,8 @@
  * Controls: Difficulty, Game Speed, Sound FX, Background Music, Theme
  */
 import { Link } from "wouter";
-import { ArrowLeft, Gamepad2, Home, Volume2, VolumeX, Music, Settings as SettingsIcon, Zap, RotateCcw, Monitor, Moon, Sun } from "lucide-react";
+import { ArrowLeft, Gamepad2, Home, Volume2, VolumeX, Music, Settings as SettingsIcon, Zap, RotateCcw, Monitor, Moon, Sun, BookOpen, Check } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
@@ -301,11 +302,21 @@ export default function Settings() {
             </div>
           </motion.section>
 
-          {/* Test Sound & Reset */}
+          {/* Reset Tutorials Section */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.45 }}
+            className="rounded-xl border border-border/50 bg-card p-4 sm:p-6"
+          >
+            <ResetTutorialsSection />
+          </motion.section>
+
+          {/* Test Sound & Reset */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
             className="flex flex-col sm:flex-row gap-3"
           >
             <Button
@@ -339,5 +350,125 @@ export default function Settings() {
         </div>
       </main>
     </div>
+  );
+}
+
+const TUTORIAL_STORAGE_KEY = "pixel-playground-tutorials-seen";
+
+const ALL_GAME_TUTORIALS = [
+  { id: "snake", label: "Snake" },
+  { id: "flappy", label: "Flappy Bird" },
+  { id: "dino", label: "Dino Jump" },
+  { id: "tetris", label: "Tetris" },
+  { id: "pong", label: "Pong" },
+  { id: "invaders", label: "Space Invaders" },
+  { id: "minesweeper", label: "Minesweeper" },
+  { id: "breakout", label: "Breakout" },
+  { id: "2048", label: "2048" },
+  { id: "memory-match", label: "Memory Match" },
+  { id: "whack-a-mole", label: "Whack-a-Mole" },
+];
+
+function ResetTutorialsSection() {
+  const [resetDone, setResetDone] = useState(false);
+  const [seenCount, setSeenCount] = useState(() => {
+    try {
+      const stored = localStorage.getItem(TUTORIAL_STORAGE_KEY);
+      return stored ? Object.keys(JSON.parse(stored)).length : 0;
+    } catch {
+      return 0;
+    }
+  });
+
+  const handleResetAll = () => {
+    try {
+      localStorage.removeItem(TUTORIAL_STORAGE_KEY);
+      setSeenCount(0);
+      setResetDone(true);
+      setTimeout(() => setResetDone(false), 2000);
+    } catch {
+      // localStorage unavailable
+    }
+  };
+
+  const handleResetSingle = (gameId: string) => {
+    try {
+      const stored = localStorage.getItem(TUTORIAL_STORAGE_KEY);
+      const seen = stored ? JSON.parse(stored) : {};
+      delete seen[gameId];
+      localStorage.setItem(TUTORIAL_STORAGE_KEY, JSON.stringify(seen));
+      setSeenCount(Object.keys(seen).length);
+    } catch {
+      // localStorage unavailable
+    }
+  };
+
+  const isSeen = (gameId: string) => {
+    try {
+      const stored = localStorage.getItem(TUTORIAL_STORAGE_KEY);
+      const seen = stored ? JSON.parse(stored) : {};
+      return !!seen[gameId];
+    } catch {
+      return false;
+    }
+  };
+
+  return (
+    <>
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-8 h-8 rounded-lg bg-arcade-mint/20 flex items-center justify-center">
+          <BookOpen className="w-4 h-4 text-arcade-mint" />
+        </div>
+        <div className="flex-1">
+          <h2 className="font-pixel text-sm sm:text-base text-foreground">GAME TUTORIALS</h2>
+          <p className="text-[10px] sm:text-xs text-muted-foreground">
+            {seenCount} of {ALL_GAME_TUTORIALS.length} tutorials viewed
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className={`font-pixel text-[10px] sm:text-xs gap-1.5 transition-all ${
+            resetDone
+              ? "border-emerald-500/50 text-emerald-400 bg-emerald-500/10"
+              : "border-arcade-mint/30 text-arcade-mint hover:bg-arcade-mint/10"
+          }`}
+          onClick={handleResetAll}
+          disabled={seenCount === 0}
+        >
+          {resetDone ? (
+            <><Check className="w-3 h-3" /> RESET!</>
+          ) : (
+            <><RotateCcw className="w-3 h-3" /> RESET ALL</>
+          )}
+        </Button>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2">
+        {ALL_GAME_TUTORIALS.map((game) => {
+          const seen = isSeen(game.id);
+          return (
+            <button
+              key={game.id}
+              onClick={() => seen && handleResetSingle(game.id)}
+              disabled={!seen}
+              className={`rounded-lg border px-2 py-1.5 sm:px-3 sm:py-2 text-left transition-all duration-200 ${
+                seen
+                  ? "border-arcade-mint/20 bg-arcade-mint/5 hover:bg-arcade-mint/10 cursor-pointer"
+                  : "border-border/30 bg-background opacity-50 cursor-default"
+              }`}
+            >
+              <span className={`font-pixel text-[9px] sm:text-[10px] block ${
+                seen ? "text-arcade-mint" : "text-muted-foreground"
+              }`}>
+                {game.label}
+              </span>
+              <span className="text-[8px] sm:text-[9px] text-muted-foreground">
+                {seen ? "Tap to reset" : "Not viewed"}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </>
   );
 }

@@ -13,6 +13,10 @@ import {
   getUserRecentScores,
   getUserTotalGamesPlayed,
   getUserGameStats,
+  getUserFavorites,
+  addFavorite,
+  removeFavorite,
+  getGamePlayCounts,
 } from "./db";
 import { checkAchievements } from "../shared/achievements";
 
@@ -108,6 +112,36 @@ export const appRouter = router({
         return { unlocked: isNew, achievementId: "all-games" };
       }
       return { unlocked: false, gamesPlayed: gamesPlayed.size };
+    }),
+  }),
+
+  favorites: router({
+    /** Get the current user's favorite games */
+    getMyFavorites: protectedProcedure.query(async ({ ctx }) => {
+      const favs = await getUserFavorites(ctx.user.id);
+      return favs.map(f => f.gameId);
+    }),
+
+    /** Toggle a game as favorite */
+    toggle: protectedProcedure
+      .input(z.object({ gameId: z.enum(VALID_GAMES) }))
+      .mutation(async ({ ctx, input }) => {
+        const favs = await getUserFavorites(ctx.user.id);
+        const isFavorited = favs.some(f => f.gameId === input.gameId);
+        if (isFavorited) {
+          await removeFavorite(ctx.user.id, input.gameId);
+          return { favorited: false, gameId: input.gameId };
+        } else {
+          await addFavorite({ userId: ctx.user.id, gameId: input.gameId });
+          return { favorited: true, gameId: input.gameId };
+        }
+      }),
+  }),
+
+  gameStats: router({
+    /** Get play counts per game (for HOT badge) */
+    getPlayCounts: publicProcedure.query(async () => {
+      return getGamePlayCounts();
     }),
   }),
 

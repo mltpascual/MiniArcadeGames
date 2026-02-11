@@ -6,10 +6,12 @@
  * - Silkscreen pixel font for headings, Outfit for body
  */
 import { useAuth } from "@/_core/hooks/useAuth";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
-import { Gamepad2, Zap, Settings, Trophy, Award, User, Search, X } from "lucide-react";
+import { Gamepad2, Zap, Settings, Trophy, Award, User, Search, X, Star, Flame, Sparkles } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { getLoginUrl } from "@/const";
 
 const HERO_IMG = "https://private-us-east-1.manuscdn.com/sessionFile/47LZSGYqN22BYCYAxPiaxL/sandbox/2gvGaXiIcbq5AtvP2rclMh-img-1_1770800508000_na1fn_aGVyby1hcmNhZGU.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvNDdMWlNHWXFOMjJCWUNZQXhQaWF4TC9zYW5kYm94LzJndkdhWGlJY2JxNUF0dlAycmNsTWgtaW1nLTFfMTc3MDgwMDUwODAwMF9uYTFmbl9hR1Z5YnkxaGNtTmhaR1UucG5nP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTkyMCxoXzE5MjAvZm9ybWF0LHdlYnAvcXVhbGl0eSxxXzgwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=nTbEBvwm5ChOvub7wedCQMyEBwIAY9Yq6ObAudIcHubjRSNUGOF89zeR6Ao20c7Er100ntL-zXZOOBUy1NhIx9AHVwmtCye7YSJZ2Jo4SQuAdgY5O~H6Mo08PhHf8Eebxu8v33ynfQggloMlk9cDoxQKd4nmxE-0lApXya4BsIaiy56QlGU0NZotn189Odye82Zs14FwXhx6b6EcqLXBuS-LlrJhVPrJcIk8BpOT4TWAV~uHebM-cDwvwqZb~BrmrbN7EMHoLTv4IB5hM9BVeOr10e96vW3uVOaaBboj5-PJ4W49jCIfBD3L7tOnljZDcPt0fLvP3dLXbfaS5JJTFg__";
 
@@ -35,9 +37,15 @@ const MEMORY_IMG = "https://private-us-east-1.manuscdn.com/sessionFile/47LZSGYqN
 
 const WHACK_IMG = "https://private-us-east-1.manuscdn.com/sessionFile/47LZSGYqN22BYCYAxPiaxL/sandbox/TY6ysznn7Od95lcSR3nYgr-img-5_1770806205000_na1fn_d2hhY2stYS1tb2xlLWNhcmQ.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvNDdMWlNHWXFOMjJCWUNZQXhQaWF4TC9zYW5kYm94L1RZNnlzem5uN09kOTVsY1NSM25ZZ3ItaW1nLTVfMTc3MDgwNjIwNTAwMF9uYTFmbl9kMmhoWTJzdFlTMXRiMnhsTFdOaGNtUS5wbmc~eC1vc3MtcHJvY2Vzcz1pbWFnZS9yZXNpemUsd18xOTIwLGhfMTkyMC9mb3JtYXQsd2VicC9xdWFsaXR5LHFfODAiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3OTg3NjE2MDB9fX1dfQ__&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=C7YyC-Lpfi16jqw8B4bBLDEUlnq3ADbFsqWj0NzCIzmmPTTdl45PIQ9E-WUdgRnhE45xaQIkhhye2tas6HT7WCiqva07w46kFiyyuecHJUv7kUFuzGcFb4mS0XTVEarTHNp3NAhAkoCiXSZBDodpVuLyDz9UPeJeTMsCfUZfDrQS-nRQg1US6mwUWH~T~Yb97nta8gDc9oTIytAoN~cTcGSDOSjobHEJscR8~nHpveR-BkHBrepDa3kg3yyFxuorf-7NyhKx3fDc0mQYQ3-~bB0oo8UxgF5Cw~jNhob6kNnv6Zb-iOF~GOlZEaqr5QgLU2xPXJfks~MP9GsnIVfvoA__";
 
+// Games added in the latest batch (shown with NEW badge)
+const NEW_GAME_IDS = new Set(["minesweeper", "breakout", "2048", "memory-match", "whack-a-mole"]);
+// Threshold: games with >= this many total plays get a HOT badge
+const HOT_PLAY_THRESHOLD = 5;
+
 const games = [
   {
     id: "snake",
+    backendId: "snake" as const,
     title: "Snake",
     description: "Guide the snake, eat the apples, grow longer. Classic arcade fun with a modern twist.",
     path: "/snake",
@@ -47,6 +55,7 @@ const games = [
   },
   {
     id: "flappy",
+    backendId: "flappy-bird" as const,
     title: "Flappy Bird",
     description: "Tap to fly through the pipes. One wrong move and it's game over. How far can you go?",
     path: "/flappy-bird",
@@ -56,6 +65,7 @@ const games = [
   },
   {
     id: "dino",
+    backendId: "dino-jump" as const,
     title: "Dino Jump",
     description: "Run, jump, and dodge obstacles in this endless desert runner. Beat your high score!",
     path: "/dino-jump",
@@ -65,6 +75,7 @@ const games = [
   },
   {
     id: "tetris",
+    backendId: "tetris" as const,
     title: "Tetris",
     description: "Stack the falling blocks, clear lines, and chase the high score. The ultimate puzzle game.",
     path: "/tetris",
@@ -74,6 +85,7 @@ const games = [
   },
   {
     id: "pong",
+    backendId: "pong" as const,
     title: "Pong",
     description: "The original arcade classic. Beat the AI in this fast-paced table tennis showdown.",
     path: "/pong",
@@ -83,6 +95,7 @@ const games = [
   },
   {
     id: "invaders",
+    backendId: "space-invaders" as const,
     title: "Space Invaders",
     description: "Defend Earth from waves of alien invaders. Shoot, dodge, and survive as long as you can!",
     path: "/space-invaders",
@@ -92,6 +105,7 @@ const games = [
   },
   {
     id: "minesweeper",
+    backendId: "minesweeper" as const,
     title: "Minesweeper",
     description: "Reveal tiles, flag mines, and clear the board. One wrong click and it's game over!",
     path: "/minesweeper",
@@ -101,6 +115,7 @@ const games = [
   },
   {
     id: "breakout",
+    backendId: "breakout" as const,
     title: "Breakout",
     description: "Smash bricks with a bouncing ball and paddle. Clear all the bricks to win!",
     path: "/breakout",
@@ -110,6 +125,7 @@ const games = [
   },
   {
     id: "2048",
+    backendId: "2048" as const,
     title: "2048",
     description: "Slide and merge tiles to reach 2048. A simple concept that's endlessly addictive.",
     path: "/2048",
@@ -119,6 +135,7 @@ const games = [
   },
   {
     id: "memory-match",
+    backendId: "memory-match" as const,
     title: "Memory Match",
     description: "Flip cards and find matching pairs. Test your memory and beat the clock!",
     path: "/memory-match",
@@ -128,6 +145,7 @@ const games = [
   },
   {
     id: "whack-a-mole",
+    backendId: "whack-a-mole" as const,
     title: "Whack-a-Mole",
     description: "Whack the moles as they pop up! Fast reflexes earn the highest scores.",
     path: "/whack-a-mole",
@@ -138,12 +156,13 @@ const games = [
 ];
 
 const categories = [
-  { id: "all", label: "ALL", color: "text-foreground" },
-  { id: "classic", label: "CLASSIC", color: "text-arcade-mint" },
-  { id: "puzzle", label: "PUZZLE", color: "text-arcade-indigo" },
-  { id: "action", label: "ACTION", color: "text-arcade-coral" },
-  { id: "brain", label: "BRAIN", color: "text-arcade-coral" },
-  { id: "reflex", label: "REFLEX", color: "text-arcade-mint" },
+  { id: "all", label: "ALL", icon: null },
+  { id: "favorites", label: "\u2605 FAVS", icon: null },
+  { id: "classic", label: "CLASSIC", icon: null },
+  { id: "puzzle", label: "PUZZLE", icon: null },
+  { id: "action", label: "ACTION", icon: null },
+  { id: "brain", label: "BRAIN", icon: null },
+  { id: "reflex", label: "REFLEX", icon: null },
 ];
 
 const gameCategoryMap: Record<string, string> = {
@@ -213,11 +232,58 @@ const itemVariants = {
 };
 
 export default function Home() {
-  // The userAuth hooks provides authentication state
-  // To implement login/logout functionality, simply call logout() or redirect to getLoginUrl()
-  let { user, loading, error, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+
+  // Favorites: only fetch if logged in
+  const favoritesQuery = trpc.favorites.getMyFavorites.useQuery(undefined, {
+    enabled: isAuthenticated,
+    staleTime: 30_000,
+  });
+  const favoriteGameIds = useMemo(() => new Set(favoritesQuery.data ?? []), [favoritesQuery.data]);
+
+  const utils = trpc.useUtils();
+  const toggleFavorite = trpc.favorites.toggle.useMutation({
+    onMutate: async ({ gameId }) => {
+      await utils.favorites.getMyFavorites.cancel();
+      const prev = utils.favorites.getMyFavorites.getData() ?? [];
+      const isFav = prev.includes(gameId);
+      utils.favorites.getMyFavorites.setData(undefined,
+        isFav ? prev.filter(id => id !== gameId) : [...prev, gameId]
+      );
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) utils.favorites.getMyFavorites.setData(undefined, ctx.prev);
+    },
+    onSettled: () => {
+      utils.favorites.getMyFavorites.invalidate();
+    },
+  });
+
+  // Game play counts for HOT badge
+  const playCountsQuery = trpc.gameStats.getPlayCounts.useQuery(undefined, {
+    staleTime: 60_000,
+  });
+  const hotGameIds = useMemo(() => {
+    const counts = playCountsQuery.data ?? [];
+    const hot = new Set<string>();
+    for (const c of counts) {
+      if (c.totalPlays >= HOT_PLAY_THRESHOLD) hot.add(c.game);
+    }
+    return hot;
+  }, [playCountsQuery.data]);
+
+  const handleToggleFavorite = useCallback((e: React.MouseEvent, backendId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      window.location.href = getLoginUrl();
+      return;
+    }
+    toggleFavorite.mutate({ gameId: backendId as any });
+  }, [isAuthenticated, toggleFavorite]);
 
   const filteredGames = useMemo(() => {
     return games.filter((game) => {
@@ -225,11 +291,14 @@ export default function Home() {
         game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         game.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         game.tag.toLowerCase().includes(searchQuery.toLowerCase());
+      if (activeCategory === "favorites") {
+        return matchesSearch && favoriteGameIds.has(game.backendId);
+      }
       const matchesCategory = activeCategory === "all" ||
         gameCategoryMap[game.tag] === activeCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, activeCategory]);
+  }, [searchQuery, activeCategory, favoriteGameIds]);
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
@@ -393,8 +462,14 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
             >
               <Gamepad2 className="w-12 h-12 sm:w-16 sm:h-16 text-muted-foreground/30 mx-auto mb-4" />
-              <p className="font-pixel text-sm sm:text-base text-muted-foreground mb-2">NO GAMES FOUND</p>
-              <p className="text-xs sm:text-sm text-muted-foreground/60">Try a different search or category</p>
+              <p className="font-pixel text-sm sm:text-base text-muted-foreground mb-2">
+                {activeCategory === "favorites" ? "NO FAVORITES YET" : "NO GAMES FOUND"}
+              </p>
+              <p className="text-xs sm:text-sm text-muted-foreground/60">
+                {activeCategory === "favorites"
+                  ? (isAuthenticated ? "Star games to add them to your favorites!" : "Log in to save your favorite games")
+                  : "Try a different search or category"}
+              </p>
               <button
                 onClick={() => { setSearchQuery(""); setActiveCategory("all"); }}
                 className="mt-4 px-4 py-2 rounded-lg bg-arcade-indigo/20 text-arcade-indigo font-pixel text-xs hover:bg-arcade-indigo/30 transition-colors"
@@ -410,57 +485,95 @@ export default function Home() {
             animate="visible"
           >
             <AnimatePresence mode="popLayout">
-                   {filteredGames.map((game) => {
-              const colors = colorMap[game.color];
-              return (
-                <motion.div key={game.id} variants={itemVariants} layout>
-                  <Link href={game.path}>
-                    <motion.div
-                      className={`group relative rounded-lg sm:rounded-xl border ${colors.border} ${colors.hoverBorder} bg-card overflow-hidden transition-colors duration-300 h-full`}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.97 }}
-                    >
-                      {/* Card image */}
-                      <div className="relative h-28 sm:h-40 md:h-48 overflow-hidden">
-                        <img
-                          src={game.image}
-                          alt={game.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
-                        <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
-                          <span className={`font-pixel text-[10px] sm:text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded-full ${colors.tagBg} ${colors.tagText}`}>
-                            {game.tag}
-                          </span>
+              {filteredGames.map((game) => {
+                const colors = colorMap[game.color];
+                const isFav = favoriteGameIds.has(game.backendId);
+                const isNew = NEW_GAME_IDS.has(game.id);
+                const isHot = hotGameIds.has(game.backendId);
+                return (
+                  <motion.div key={game.id} variants={itemVariants} layout>
+                    <Link href={game.path}>
+                      <motion.div
+                        className={`group relative rounded-lg sm:rounded-xl border ${colors.border} ${colors.hoverBorder} bg-card overflow-hidden transition-colors duration-300 h-full`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.97 }}
+                      >
+                        {/* Card image */}
+                        <div className="relative h-28 sm:h-40 md:h-48 overflow-hidden">
+                          <img
+                            src={game.image}
+                            alt={game.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+                          {/* Tag + Badges row */}
+                          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex items-center gap-1.5">
+                            <span className={`font-pixel text-[10px] sm:text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded-full ${colors.tagBg} ${colors.tagText}`}>
+                              {game.tag}
+                            </span>
+                            {isNew && (
+                              <motion.span
+                                className="font-pixel text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-emerald-500/90 text-white flex items-center gap-0.5"
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                              >
+                                <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                                NEW
+                              </motion.span>
+                            )}
+                            {isHot && !isNew && (
+                              <motion.span
+                                className="font-pixel text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-orange-500/90 text-white flex items-center gap-0.5"
+                                initial={{ scale: 0 }}
+                                animate={{ scale: [1, 1.1, 1] }}
+                                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                              >
+                                <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                                HOT
+                              </motion.span>
+                            )}
+                          </div>
+                          {/* Favorite star button */}
+                          <button
+                            onClick={(e) => handleToggleFavorite(e, game.backendId)}
+                            className={`absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-200 z-10 ${
+                              isFav
+                                ? "bg-yellow-400/90 text-yellow-900 shadow-lg shadow-yellow-400/30"
+                                : "bg-black/40 text-white/60 hover:bg-black/60 hover:text-white backdrop-blur-sm"
+                            }`}
+                            title={isFav ? "Remove from favorites" : "Add to favorites"}
+                          >
+                            <Star className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isFav ? "fill-current" : ""}`} />
+                          </button>
                         </div>
-                      </div>
 
-                      {/* Card content */}
-                      <div className="p-3 sm:p-4 md:p-5">
-                        <h3 className={`font-pixel text-sm sm:text-lg md:text-xl ${colors.text} mb-1 sm:mb-2`}>
-                          {game.title}
-                        </h3>
-                        <p className="text-[11px] sm:text-sm text-muted-foreground leading-relaxed mb-2 sm:mb-4 line-clamp-2">
-                          {game.description}
-                        </p>
+                        {/* Card content */}
+                        <div className="p-3 sm:p-4 md:p-5">
+                          <h3 className={`font-pixel text-sm sm:text-lg md:text-xl ${colors.text} mb-1 sm:mb-2`}>
+                            {game.title}
+                          </h3>
+                          <p className="text-[11px] sm:text-sm text-muted-foreground leading-relaxed mb-2 sm:mb-4 line-clamp-2">
+                            {game.description}
+                          </p>
+                          <div
+                            className={`inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 rounded-md sm:rounded-lg ${colors.btnBg} ${colors.btnText} font-semibold text-[10px] sm:text-sm transition-all group-hover:gap-3`}
+                          >
+                            Play
+                            <span className="transition-transform group-hover:translate-x-1">&rarr;</span>
+                          </div>
+                        </div>
+
+                        {/* Hover glow effect */}
                         <div
-                          className={`inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 rounded-md sm:rounded-lg ${colors.btnBg} ${colors.btnText} font-semibold text-[10px] sm:text-sm transition-all group-hover:gap-3`}
-                        >
-                          Play
-                          <span className="transition-transform group-hover:translate-x-1">→</span>
-                        </div>
-                      </div>
-
-                      {/* Hover glow effect */}
-                      <div
-                        className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none ${colors.glow}`}
-                        style={{ borderRadius: "inherit" }}
-                      />
-                    </motion.div>
-                  </Link>
-                </motion.div>
-              );
-            })}
+                          className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none ${colors.glow}`}
+                          style={{ borderRadius: "inherit" }}
+                        />
+                      </motion.div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </motion.div>
           )}

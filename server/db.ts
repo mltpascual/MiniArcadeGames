@@ -1,6 +1,6 @@
 import { eq, and, desc, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, scores, InsertScore, achievements, InsertAchievement } from "../drizzle/schema";
+import { InsertUser, users, scores, InsertScore, achievements, InsertAchievement, favorites, InsertFavorite } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -213,6 +213,54 @@ export async function getUserTotalGamesPlayed(userId: number) {
     .from(scores)
     .where(eq(scores.userId, userId));
   return result[0]?.count ?? 0;
+}
+
+// ─── Favorites Queries ───
+
+export async function getUserFavorites(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(favorites)
+    .where(eq(favorites.userId, userId))
+    .orderBy(desc(favorites.createdAt));
+}
+
+export async function addFavorite(data: InsertFavorite) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  // Check if already favorited
+  const existing = await db
+    .select()
+    .from(favorites)
+    .where(and(eq(favorites.userId, data.userId), eq(favorites.gameId, data.gameId)))
+    .limit(1);
+  if (existing.length > 0) return false; // already favorited
+  await db.insert(favorites).values(data);
+  return true;
+}
+
+export async function removeFavorite(userId: number, gameId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .delete(favorites)
+    .where(and(eq(favorites.userId, userId), eq(favorites.gameId, gameId)));
+  return true;
+}
+
+/** Get the total number of scores submitted per game (for HOT badge) */
+export async function getGamePlayCounts() {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select({
+      game: scores.game,
+      totalPlays: sql<number>`COUNT(*)`,
+    })
+    .from(scores)
+    .groupBy(scores.game);
 }
 
 /** Get the user's best score per game along with total plays per game */

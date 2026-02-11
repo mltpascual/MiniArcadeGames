@@ -37,3 +37,7 @@
 - [x] Search bar on homepage to filter games by name
 - [x] Category filter tabs (All, Classic, Puzzle, Action, Brain, Reflex) on homepage
 - [x] Game tutorial overlay on first play for all 11 games
+- [x] Favorites system — database table, API endpoints, star toggle on game cards
+- [x] Favorites filter tab on homepage for logged-in users
+- [x] Animated NEW/HOT badges on game cards based on leaderboard data
+- [x] Reset Tutorial option in Settings page
