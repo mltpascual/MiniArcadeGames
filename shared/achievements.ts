@@ -43,9 +43,31 @@ export const ACHIEVEMENT_DEFS: AchievementDef[] = [
   { id: "invaders-2000", title: "Alien Slayer", description: "Score 2000 in Space Invaders", icon: "👾", game: "space-invaders", category: "score" },
   { id: "invaders-wave-5", title: "Wave Rider", description: "Reach wave 5 in Space Invaders", icon: "🌊", game: "space-invaders", category: "milestone" },
 
+  // Minesweeper
+  { id: "minesweeper-clear", title: "Mine Sweeper", description: "Clear a Minesweeper board", icon: "💣", game: "minesweeper", category: "milestone" },
+  { id: "minesweeper-500", title: "Bomb Squad", description: "Score 500 in Minesweeper", icon: "🔍", game: "minesweeper", category: "score" },
+  { id: "minesweeper-hard", title: "Danger Zone", description: "Clear a Hard Minesweeper board", icon: "☠️", game: "minesweeper", category: "challenge" },
+
+  // Breakout
+  { id: "breakout-500", title: "Brick Breaker", description: "Score 500 in Breakout", icon: "🧱", game: "breakout", category: "score" },
+  { id: "breakout-2000", title: "Wall Smasher", description: "Score 2000 in Breakout", icon: "💥", game: "breakout", category: "score" },
+
+  // 2048
+  { id: "2048-1024", title: "Halfway There", description: "Reach the 1024 tile", icon: "🔢", game: "2048", category: "milestone" },
+  { id: "2048-2048", title: "2048 Champion", description: "Reach the 2048 tile", icon: "🏆", game: "2048", category: "challenge" },
+  { id: "2048-5000", title: "Number Cruncher", description: "Score 5000 in 2048", icon: "📊", game: "2048", category: "score" },
+
+  // Memory Match
+  { id: "memory-clear", title: "Perfect Memory", description: "Complete a Memory Match game", icon: "🧠", game: "memory-match", category: "milestone" },
+  { id: "memory-800", title: "Memory Master", description: "Score 800+ in Memory Match", icon: "🎯", game: "memory-match", category: "score" },
+
+  // Whack-a-Mole
+  { id: "whack-50", title: "Mole Hunter", description: "Score 50 in Whack-a-Mole", icon: "🔨", game: "whack-a-mole", category: "score" },
+  { id: "whack-100", title: "Mole Masher", description: "Score 100 in Whack-a-Mole", icon: "⚡", game: "whack-a-mole", category: "score" },
+
   // Global
   { id: "first-game", title: "Welcome!", description: "Play your first game", icon: "🎮", game: "global", category: "milestone" },
-  { id: "all-games", title: "Arcade Master", description: "Play all 6 games", icon: "🎪", game: "global", category: "challenge" },
+  { id: "all-games", title: "Arcade Master", description: "Play all 11 games", icon: "🎪", game: "global", category: "challenge" },
 ];
 
 export function getAchievementDef(id: string): AchievementDef | undefined {
@@ -59,7 +81,7 @@ export function getAchievementDef(id: string): AchievementDef | undefined {
 export function checkAchievements(
   game: string,
   score: number,
-  extras?: { lines?: number; wave?: number; playerScore?: number; aiScore?: number; fourLineClears?: number }
+  extras?: { lines?: number; wave?: number; playerScore?: number; aiScore?: number; fourLineClears?: number; difficulty?: string; maxTile?: number }
 ): string[] {
   const unlocked: string[] = [];
 
@@ -98,6 +120,28 @@ export function checkAchievements(
       if (score >= 500) unlocked.push("invaders-500");
       if (score >= 2000) unlocked.push("invaders-2000");
       if (extras?.wave && extras.wave >= 5) unlocked.push("invaders-wave-5");
+      break;
+    case "minesweeper":
+      if (score > 0) unlocked.push("minesweeper-clear");
+      if (score >= 500) unlocked.push("minesweeper-500");
+      if (extras?.difficulty === "hard" && score > 0) unlocked.push("minesweeper-hard");
+      break;
+    case "breakout":
+      if (score >= 500) unlocked.push("breakout-500");
+      if (score >= 2000) unlocked.push("breakout-2000");
+      break;
+    case "2048":
+      if (score >= 5000) unlocked.push("2048-5000");
+      if (extras?.maxTile && extras.maxTile >= 1024) unlocked.push("2048-1024");
+      if (extras?.maxTile && extras.maxTile >= 2048) unlocked.push("2048-2048");
+      break;
+    case "memory-match":
+      if (score > 0) unlocked.push("memory-clear");
+      if (score >= 800) unlocked.push("memory-800");
+      break;
+    case "whack-a-mole":
+      if (score >= 50) unlocked.push("whack-50");
+      if (score >= 100) unlocked.push("whack-100");
       break;
   }
 

@@ -24,6 +24,16 @@ const PONG_IMG = "https://private-us-east-1.manuscdn.com/sessionFile/47LZSGYqN22
 
 const INVADERS_IMG = "https://private-us-east-1.manuscdn.com/sessionFile/47LZSGYqN22BYCYAxPiaxL/sandbox/UJghc7a41mXGL8ktRNJMM5-img-3_1770802265000_na1fn_aW52YWRlcnMtY2FyZA.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvNDdMWlNHWXFOMjJCWUNZQXhQaWF4TC9zYW5kYm94L1VKZ2hjN2E0MW1YR0w4a3RSTkpNTTUtaW1nLTNfMTc3MDgwMjI2NTAwMF9uYTFmbl9hVzUyWVdSbGNuTXRZMkZ5WkEucG5nP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTkyMCxoXzE5MjAvZm9ybWF0LHdlYnAvcXVhbGl0eSxxXzgwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=Gkhr7bakTygMiyx9vUIo3wDad~l~gd5TYE4v~EFD2N9zBH7RId2d45Tlk1xmbExwo2yNaQzgPwCOE9wB1Ri7Dt3KV731X0vJFZ37QjIxCjoBl8JmaACChdwIMkD4LSL8b3KXoONKSJIJTAkaYedSTxu2y29Ibb2Zy78XI14rqtHI5feRmBAUAZr1pzfjDAypvxyZsZyQ-U6tydP6siW30ocwB~a6iG3u9SFaKFKlJhr6KVEv934nmcY1X2kVbKoHw9rb7N89NagdFblRACyNoEpdbMMqrn6Lgs-Q~Dq9-ubCXPuIu0XXhCVRsUWcl81J0oG3g-s31IcuPwbjpsDGPw__";
 
+const MINESWEEPER_IMG = "https://private-us-east-1.manuscdn.com/sessionFile/47LZSGYqN22BYCYAxPiaxL/sandbox/TY6ysznn7Od95lcSR3nYgr-img-1_1770806206000_na1fn_bWluZXN3ZWVwZXItY2FyZA.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvNDdMWlNHWXFOMjJCWUNZQXhQaWF4TC9zYW5kYm94L1RZNnlzem5uN09kOTVsY1NSM25ZZ3ItaW1nLTFfMTc3MDgwNjIwNjAwMF9uYTFmbl9iV2x1WlhOM1pXVndaWEl0WTJGeVpBLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSx3XzE5MjAsaF8xOTIwL2Zvcm1hdCx3ZWJwL3F1YWxpdHkscV84MCIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5ODc2MTYwMH19fV19&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=g-eUnRBqCauk2UfmG6Scs0FTAJoXo9OkFpAb4KPqyxw1on79LDK9Q-eALtW4ZJTPyqfGfOmJ5bTtuVJrYZnaBgFecQeQadice4IkmJUVJyLBwQN88RljzDIPx5DH0ePRtagACtwYsSW0Ob7lkzDkvnJjxf1SnCERHzem~I5HMJG-aQRJ9AX09I2VZwndt2NIXuC4RlWVJNfqRHJaTFR6HkrbsoYwrABl6ldkXXIfNeUgPTvCEOeZM84Cpl22Pu5q2OgdWQi~acceq9puROTCcbedMnZmkjkplo9aB3gBftnETdYmC2xdMM9JHcsP4SkEXd7PcCFf0GOLnIl7pL4rwA__";
+
+const BREAKOUT_IMG = "https://private-us-east-1.manuscdn.com/sessionFile/47LZSGYqN22BYCYAxPiaxL/sandbox/TY6ysznn7Od95lcSR3nYgr-img-2_1770806210000_na1fn_YnJlYWtvdXQtY2FyZA.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvNDdMWlNHWXFOMjJCWUNZQXhQaWF4TC9zYW5kYm94L1RZNnlzem5uN09kOTVsY1NSM25ZZ3ItaW1nLTJfMTc3MDgwNjIxMDAwMF9uYTFmbl9ZbkpsWVd0dmRYUXRZMkZ5WkEucG5nP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTkyMCxoXzE5MjAvZm9ybWF0LHdlYnAvcXVhbGl0eSxxXzgwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=v5cAkq4PkOZ~Wr2KEnxH90H3MgIkjAswJwW3TbREqQ5xtRa9uYlLrHo0pdSchaON3zOsbh2RiraMKgTzy0lxqvgyNpFXGI85Gr5OYFDgPw8voyrPpQmV7xFMA7TDjoRQd3mmqUJxAUje5jmKvLw2y6omBI8O52vq7yEL1VBLCy7dxevAdD1mFncoqB8JLMRkYgXH17xBGrtNhke6ZQe6jqQXVRvIceZGThZReLnzTpH82Ok1llNNghYb2ehFmREwBCA~GZrKw8GUMWXAhKH1zdkNpSyg51IdL4yN8RqkjwCRKS5TuJ4-QLPM2oJSSIFSmSxsIFjIzb-z4yIDH~pADA__";
+
+const GAME2048_IMG = "https://private-us-east-1.manuscdn.com/sessionFile/47LZSGYqN22BYCYAxPiaxL/sandbox/TY6ysznn7Od95lcSR3nYgr-img-3_1770806205000_na1fn_MjA0OC1jYXJk.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvNDdMWlNHWXFOMjJCWUNZQXhQaWF4TC9zYW5kYm94L1RZNnlzem5uN09kOTVsY1NSM25ZZ3ItaW1nLTNfMTc3MDgwNjIwNTAwMF9uYTFmbl9NakEwT0MxallYSmsucG5nP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTkyMCxoXzE5MjAvZm9ybWF0LHdlYnAvcXVhbGl0eSxxXzgwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=maAd97weBuxEAKcuV6ZVgBx61yd6o70UODPhfjWiQSoOptfpyU8AiZ7124Kca67ZTOQy9HPt0M89MseMJHh-s2kwktlfnOs0rRr0ps5BxWslGhw7r6sc~Qo3aVmA32VO8OAlRpgLkrfk13K2oYqzivNQcQUEvc7C~ebDjRem2kB2id1T3HqAThjhGhYUhsd-l7n~mwvnXuk2MrMwmla~ippFP7qjugb~FmP8YUsE8xeL2p60CgWDuG3cfK4uLbcj~ey8-tRlxFJBH~FC-nqwYpETsUjByo-fllKk~vE-DJYQpCZQ9goNDCZbjlmaKv2tKJ9q5HdguEBHciNOgpoGsw__";
+
+const MEMORY_IMG = "https://private-us-east-1.manuscdn.com/sessionFile/47LZSGYqN22BYCYAxPiaxL/sandbox/TY6ysznn7Od95lcSR3nYgr-img-4_1770806201000_na1fn_bWVtb3J5LWNhcmQ.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvNDdMWlNHWXFOMjJCWUNZQXhQaWF4TC9zYW5kYm94L1RZNnlzem5uN09kOTVsY1NSM25ZZ3ItaW1nLTRfMTc3MDgwNjIwMTAwMF9uYTFmbl9iV1Z0YjNKNUxXTmhjbVEucG5nP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTkyMCxoXzE5MjAvZm9ybWF0LHdlYnAvcXVhbGl0eSxxXzgwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=Bhld0euQU9BEf31kybat4bO8rWdyjLhXhvZs3RlpHwTYnlMK-nIpdkSQrZSlDu6qf3R9-C8VoE3b9GLSCuJ8C2FTuLNHiJGTYRmcwmtjGL937a3zRhYQY9LZ5Yn8x~8tRi~qfb3EUrTdjQBqLwBHaQqrdhcjUG-PRoybmvK~sOMmkfKCHbrTA30rHDS-hXWPhDcWDbqpMDN9R8eaTVekFZ27Umd9KGflZd7h-HerUBTzK~vT-DOw4wjL9gZ-wTs3KUdImfoDSCUYfgyrF6XFT0J3o6TFsK94vLXnqjFYDggos9lqHy8~x~La9R4F9lyqID~gx7PlR-RTOvlkaJSJJA__";
+
+const WHACK_IMG = "https://private-us-east-1.manuscdn.com/sessionFile/47LZSGYqN22BYCYAxPiaxL/sandbox/TY6ysznn7Od95lcSR3nYgr-img-5_1770806205000_na1fn_d2hhY2stYS1tb2xlLWNhcmQ.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvNDdMWlNHWXFOMjJCWUNZQXhQaWF4TC9zYW5kYm94L1RZNnlzem5uN09kOTVsY1NSM25ZZ3ItaW1nLTVfMTc3MDgwNjIwNTAwMF9uYTFmbl9kMmhoWTJzdFlTMXRiMnhsTFdOaGNtUS5wbmc~eC1vc3MtcHJvY2Vzcz1pbWFnZS9yZXNpemUsd18xOTIwLGhfMTkyMC9mb3JtYXQsd2VicC9xdWFsaXR5LHFfODAiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3OTg3NjE2MDB9fX1dfQ__&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=C7YyC-Lpfi16jqw8B4bBLDEUlnq3ADbFsqWj0NzCIzmmPTTdl45PIQ9E-WUdgRnhE45xaQIkhhye2tas6HT7WCiqva07w46kFiyyuecHJUv7kUFuzGcFb4mS0XTVEarTHNp3NAhAkoCiXSZBDodpVuLyDz9UPeJeTMsCfUZfDrQS-nRQg1US6mwUWH~T~Yb97nta8gDc9oTIytAoN~cTcGSDOSjobHEJscR8~nHpveR-BkHBrepDa3kg3yyFxuorf-7NyhKx3fDc0mQYQ3-~bB0oo8UxgF5Cw~jNhob6kNnv6Zb-iOF~GOlZEaqr5QgLU2xPXJfks~MP9GsnIVfvoA__";
+
 const games = [
   {
     id: "snake",
@@ -78,6 +88,51 @@ const games = [
     image: INVADERS_IMG,
     color: "indigo" as const,
     tag: "Shooter",
+  },
+  {
+    id: "minesweeper",
+    title: "Minesweeper",
+    description: "Reveal tiles, flag mines, and clear the board. One wrong click and it's game over!",
+    path: "/minesweeper",
+    image: MINESWEEPER_IMG,
+    color: "mint" as const,
+    tag: "Strategy",
+  },
+  {
+    id: "breakout",
+    title: "Breakout",
+    description: "Smash bricks with a bouncing ball and paddle. Clear all the bricks to win!",
+    path: "/breakout",
+    image: BREAKOUT_IMG,
+    color: "coral" as const,
+    tag: "Action",
+  },
+  {
+    id: "2048",
+    title: "2048",
+    description: "Slide and merge tiles to reach 2048. A simple concept that's endlessly addictive.",
+    path: "/2048",
+    image: GAME2048_IMG,
+    color: "indigo" as const,
+    tag: "Puzzle",
+  },
+  {
+    id: "memory-match",
+    title: "Memory Match",
+    description: "Flip cards and find matching pairs. Test your memory and beat the clock!",
+    path: "/memory-match",
+    image: MEMORY_IMG,
+    color: "coral" as const,
+    tag: "Brain",
+  },
+  {
+    id: "whack-a-mole",
+    title: "Whack-a-Mole",
+    description: "Whack the moles as they pop up! Fast reflexes earn the highest scores.",
+    path: "/whack-a-mole",
+    image: WHACK_IMG,
+    color: "mint" as const,
+    tag: "Reflex",
   },
 ];
 

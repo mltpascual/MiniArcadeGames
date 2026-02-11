@@ -16,6 +16,11 @@ import Settings from "./pages/Settings";
 import Leaderboard from "./pages/Leaderboard";
 import Achievements from "./pages/Achievements";
 import Profile from "./pages/Profile";
+import MinesweeperGame from "./pages/MinesweeperGame";
+import BreakoutGame from "./pages/BreakoutGame";
+import Game2048 from "./pages/Game2048";
+import MemoryMatchGame from "./pages/MemoryMatchGame";
+import WhackAMoleGame from "./pages/WhackAMoleGame";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -27,6 +32,11 @@ function Router() {
       <Route path={"/tetris"} component={TetrisGame} />
       <Route path={"/pong"} component={PongGame} />
       <Route path={"/space-invaders"} component={SpaceInvadersGame} />
+      <Route path={"/minesweeper"} component={MinesweeperGame} />
+      <Route path={"/breakout"} component={BreakoutGame} />
+      <Route path={"/2048"} component={Game2048} />
+      <Route path={"/memory-match"} component={MemoryMatchGame} />
+      <Route path={"/whack-a-mole"} component={WhackAMoleGame} />
       <Route path={"/settings"} component={Settings} />
       <Route path={"/leaderboard"} component={Leaderboard} />
       <Route path={"/achievements"} component={Achievements} />

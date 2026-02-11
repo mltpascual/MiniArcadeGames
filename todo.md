@@ -22,3 +22,12 @@
 - [x] Unlocked achievements display on profile
 - [x] Backend API endpoints for profile data (stats, history)
 - [x] Profile link in navigation (homepage + game pages)
+- [x] Minesweeper game with touch controls and full integration
+- [x] Breakout game with touch controls and full integration
+- [x] 2048 game with swipe controls and full integration
+- [x] Memory Match game with tap controls and full integration
+- [x] Whack-a-Mole game with tap controls and full integration
+- [x] Card images for all 5 new games
+- [x] Homepage updated with 11 game cards
+- [x] Achievements for new games
+- [x] Routes and navigation for all new games

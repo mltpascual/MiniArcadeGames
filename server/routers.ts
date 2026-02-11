@@ -16,7 +16,7 @@ import {
 } from "./db";
 import { checkAchievements } from "../shared/achievements";
 
-const VALID_GAMES = ["snake", "flappy-bird", "dino-jump", "tetris", "pong", "space-invaders"] as const;
+const VALID_GAMES = ["snake", "flappy-bird", "dino-jump", "tetris", "pong", "space-invaders", "minesweeper", "breakout", "2048", "memory-match", "whack-a-mole"] as const;
 
 export const appRouter = router({
   system: systemRouter,

@@ -12,6 +12,11 @@ const GAMES = [
   { id: "tetris", label: "Tetris", color: "#f97316" },
   { id: "pong", label: "Pong", color: "#4ade80" },
   { id: "space-invaders", label: "Invaders", color: "#818cf8" },
+  { id: "minesweeper", label: "Minesweeper", color: "#4ade80" },
+  { id: "breakout", label: "Breakout", color: "#f97316" },
+  { id: "2048", label: "2048", color: "#818cf8" },
+  { id: "memory-match", label: "Memory", color: "#f97316" },
+  { id: "whack-a-mole", label: "Whack", color: "#4ade80" },
 ] as const;
 
 function RankIcon({ rank }: { rank: number }) {
