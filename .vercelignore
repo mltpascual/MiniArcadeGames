@@ -1,0 +1,22 @@
+# Development and internal files
+.manus-logs/
+.webdev/
+.git/
+
+# QA and internal notes
+qa-*.md
+ideas.md
+image-urls.md
+notes-*.txt
+
+# Test files
+**/*.test.ts
+vitest.config.ts
+coverage/
+
+# Documentation (not needed at runtime)
+DESIGN.md
+DEPLOYMENT.md
+
+# Patches and config
+patches/

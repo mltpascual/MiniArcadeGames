@@ -43,3 +43,6 @@
 - [x] Reset Tutorial option in Settings page
 - [x] Social sharing button on game-over screens (Twitter/X, Facebook, copy link) for all 11 games
 - [x] Fix Memory Match game — card symbols not centered/corrupted on cards (emoji encoding + centering fix)
+- [x] Prepare Vercel deployment configuration (vercel.json, build settings)
+- [x] Update DESIGN.md with current design system
+- [x] Create comprehensive README.md

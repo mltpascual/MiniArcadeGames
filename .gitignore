@@ -108,3 +108,12 @@ temp/
 
 # Webdev artifacts (checkpoint zips, migrations, etc.)
 .webdev/
+
+# Manus debug logs
+.manus-logs/
+
+# QA and internal notes
+qa-*.md
+ideas.md
+image-urls.md
+notes-*.txt
