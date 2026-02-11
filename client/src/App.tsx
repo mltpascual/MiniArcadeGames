@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { GameSettingsProvider } from "./contexts/GameSettingsContext";
 import Home from "./pages/Home";
 import SnakeGame from "./pages/SnakeGame";
 import FlappyBirdGame from "./pages/FlappyBirdGame";
@@ -11,6 +12,7 @@ import DinoGame from "./pages/DinoGame";
 import TetrisGame from "./pages/TetrisGame";
 import PongGame from "./pages/PongGame";
 import SpaceInvadersGame from "./pages/SpaceInvadersGame";
+import Settings from "./pages/Settings";
 
 function Router() {
   return (
@@ -22,6 +24,7 @@ function Router() {
       <Route path={"/tetris"} component={TetrisGame} />
       <Route path={"/pong"} component={PongGame} />
       <Route path={"/space-invaders"} component={SpaceInvadersGame} />
+      <Route path={"/settings"} component={Settings} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
@@ -31,11 +34,13 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="dark">
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+      <ThemeProvider defaultTheme="dark" switchable>
+        <GameSettingsProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </GameSettingsProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

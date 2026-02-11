@@ -7,6 +7,8 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import GameLayout from "@/components/GameLayout";
 import { Button } from "@/components/ui/button";
 import { Play, RotateCcw, Trophy } from "lucide-react";
+import { useGameSettings } from "@/contexts/GameSettingsContext";
+import { useSoundEngine } from "@/hooks/useSoundEngine";
 
 const CANVAS_W = 600;
 const CANVAS_H = 400;
@@ -31,6 +33,9 @@ const COLORS = {
 };
 
 export default function PongGame() {
+  const { difficultyParams, speedMultiplier } = useGameSettings();
+  const { playSound, startMusic, stopMusic } = useSoundEngine();
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState<"idle" | "playing" | "over">("idle");
   const [playerScore, setPlayerScore] = useState(0);
@@ -171,6 +176,7 @@ export default function PongGame() {
     if (ball.y - BALL_R <= 0 || ball.y + BALL_R >= CANVAS_H) {
       ball.vy *= -1;
       ball.y = Math.max(BALL_R, Math.min(CANVAS_H - BALL_R, ball.y));
+      playSound("bounce");
     }
 
     // Player paddle collision
@@ -185,6 +191,7 @@ export default function PongGame() {
       ball.vx = Math.abs(ball.vx) * 1.05;
       ball.vy = hitPos * 8;
       ball.x = 20 + PADDLE_W + BALL_R;
+      playSound("bounce");
     }
 
     // AI paddle collision
@@ -199,14 +206,18 @@ export default function PongGame() {
       ball.vx = -Math.abs(ball.vx) * 1.05;
       ball.vy = hitPos * 8;
       ball.x = CANVAS_W - 20 - PADDLE_W - BALL_R;
+      playSound("bounce");
     }
 
     // Scoring
     if (ball.x < -BALL_R) {
       aScoreRef.current++;
       setAiScore(aScoreRef.current);
+      playSound("hit");
       if (aScoreRef.current >= WIN_SCORE) {
         setWinner("ai");
+        playSound("gameOver");
+        stopMusic();
         setGameState("over");
         return;
       }
@@ -215,11 +226,14 @@ export default function PongGame() {
     if (ball.x > CANVAS_W + BALL_R) {
       pScoreRef.current++;
       setPlayerScore(pScoreRef.current);
+      playSound("win");
       if (pScoreRef.current >= WIN_SCORE) {
         setWinner("player");
         const newWins = wins + 1;
         setWins(newWins);
         localStorage.setItem("pong-wins", String(newWins));
+        playSound("levelUp");
+        stopMusic();
         setGameState("over");
         return;
       }
@@ -247,7 +261,9 @@ export default function PongGame() {
     setWinner(null);
     resetBall(Math.random() > 0.5 ? 1 : -1);
     setGameState("playing");
-  }, [resetBall]);
+    playSound("start");
+    startMusic();
+  }, [resetBall, playSound, startMusic]);
 
   useEffect(() => {
     if (gameState === "playing") {

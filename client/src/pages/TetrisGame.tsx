@@ -7,6 +7,8 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import GameLayout from "@/components/GameLayout";
 import { Button } from "@/components/ui/button";
 import { Play, RotateCcw, Trophy, RotateCw, ChevronDown, ChevronLeft, ChevronRight, ChevronsDown } from "lucide-react";
+import { useGameSettings } from "@/contexts/GameSettingsContext";
+import { useSoundEngine } from "@/hooks/useSoundEngine";
 
 const COLS = 10;
 const ROWS = 20;
@@ -55,6 +57,9 @@ function rotate(shape: number[][]): number[][] {
 }
 
 export default function TetrisGame() {
+  const { speedMultiplier } = useGameSettings();
+  const { playSound, startMusic, stopMusic } = useSoundEngine();
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nextCanvasRef = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState<"idle" | "playing" | "over">("idle");
@@ -107,6 +112,8 @@ export default function TetrisGame() {
           const nx = piece.x + c;
           if (ny < 0) {
             setGameState("over");
+            playSound("gameOver");
+            stopMusic();
             const final = scoreRef.current;
             if (final > highScore) {
               setHighScore(final);
@@ -134,10 +141,13 @@ export default function TetrisGame() {
       const points = [0, 100, 300, 500, 800][cleared] * levelRef.current;
       scoreRef.current += points;
       linesRef.current += cleared;
-      levelRef.current = Math.floor(linesRef.current / 10) + 1;
+      const newLevel = Math.floor(linesRef.current / 10) + 1;
+      if (newLevel > levelRef.current) playSound("levelUp");
+      levelRef.current = newLevel;
       setScore(scoreRef.current);
       setLines(linesRef.current);
       setLevel(levelRef.current);
+      playSound("lineClear");
     }
 
     pieceRef.current = nextPieceRef.current;
@@ -145,25 +155,29 @@ export default function TetrisGame() {
 
     if (collides(pieceRef.current, board)) {
       setGameState("over");
+      playSound("gameOver");
+      stopMusic();
       const final = scoreRef.current;
       if (final > highScore) {
         setHighScore(final);
         localStorage.setItem("tetris-highscore", String(final));
       }
     }
-  }, [collides, highScore]);
+  }, [collides, highScore, playSound, stopMusic]);
 
   const moveLeft = useCallback(() => {
     const piece = pieceRef.current;
     piece.x--;
     if (collides(piece, boardRef.current)) piece.x++;
-  }, [collides]);
+    else playSound("move");
+  }, [collides, playSound]);
 
   const moveRight = useCallback(() => {
     const piece = pieceRef.current;
     piece.x++;
     if (collides(piece, boardRef.current)) piece.x--;
-  }, [collides]);
+    else playSound("move");
+  }, [collides, playSound]);
 
   const moveDown = useCallback((): boolean => {
     const piece = pieceRef.current;
@@ -185,8 +199,9 @@ export default function TetrisGame() {
     }
     scoreRef.current += dropped * 2;
     setScore(scoreRef.current);
+    playSound("hit");
     lockPiece();
-  }, [collides, lockPiece]);
+  }, [collides, lockPiece, playSound]);
 
   const rotatePiece = useCallback(() => {
     const piece = pieceRef.current;
@@ -200,10 +215,12 @@ export default function TetrisGame() {
         if (collides(piece, boardRef.current)) {
           piece.x--;
           piece.shape = oldShape;
+          return;
         }
       }
     }
-  }, [collides]);
+    playSound("rotate");
+  }, [collides, playSound]);
 
   const getGhostY = useCallback(() => {
     const piece = pieceRef.current;
@@ -334,7 +351,9 @@ export default function TetrisGame() {
     setLines(0);
     setLevel(1);
     setGameState("playing");
-  }, []);
+    playSound("start");
+    startMusic();
+  }, [playSound, startMusic]);
 
   useEffect(() => {
     if (gameState === "playing") {

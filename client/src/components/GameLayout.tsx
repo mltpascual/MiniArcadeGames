@@ -3,7 +3,7 @@
  * Provides consistent nav, back button, and game container styling
  */
 import { Link } from "wouter";
-import { ArrowLeft, Gamepad2, Home } from "lucide-react";
+import { ArrowLeft, Gamepad2, Home, Settings } from "lucide-react";
 
 interface GameLayoutProps {
   title: string;
@@ -52,12 +52,19 @@ export default function GameLayout({ title, color, children }: GameLayoutProps) 
               {title}
             </h1>
           </div>
-          <Link href="/">
-            <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-              <Home className="w-4 h-4" />
-              <Gamepad2 className="w-4 h-4" />
-            </div>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/settings">
+              <div className="w-7 h-7 rounded-md border border-border/50 flex items-center justify-center text-muted-foreground hover:text-arcade-coral hover:border-arcade-coral/30 transition-colors">
+                <Settings className="w-3.5 h-3.5" />
+              </div>
+            </Link>
+            <Link href="/">
+              <div className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                <Home className="w-4 h-4" />
+                <Gamepad2 className="w-4 h-4" />
+              </div>
+            </Link>
+          </div>
         </div>
       </nav>
 

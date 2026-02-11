@@ -7,6 +7,8 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import GameLayout from "@/components/GameLayout";
 import { Button } from "@/components/ui/button";
 import { Play, RotateCcw, Trophy, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { useGameSettings } from "@/contexts/GameSettingsContext";
+import { useSoundEngine } from "@/hooks/useSoundEngine";
 
 const CELL_SIZE = 20;
 const GRID_W = 20;
@@ -55,6 +57,9 @@ export default function SnakeGame() {
     return saved ? parseInt(saved, 10) : 0;
   });
 
+  const { difficultyParams, speedMultiplier } = useGameSettings();
+  const { playSound, startMusic, stopMusic } = useSoundEngine();
+
   const snakeRef = useRef<Point[]>(getInitialSnake());
   const dirRef = useRef<Direction>("RIGHT");
   const nextDirRef = useRef<Direction>("RIGHT");
@@ -62,7 +67,7 @@ export default function SnakeGame() {
   const scoreRef = useRef(0);
   const gameLoopRef = useRef<number | null>(null);
   const lastTickRef = useRef(0);
-  const speedRef = useRef(120);
+  const speedRef = useRef(difficultyParams.snakeSpeed);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
   const draw = useCallback(() => {
@@ -175,9 +180,11 @@ export default function SnakeGame() {
           case "RIGHT": head.x += 1; break;
         }
 
-        // Wall collision
-        if (head.x < 0 || head.x >= GRID_W || head.y < 0 || head.y >= GRID_H) {
+      // Wall collision
+      if (head.x < 0 || head.x >= GRID_W || head.y < 0 || head.y >= GRID_H) {
           setGameState("over");
+          playSound("gameOver");
+          stopMusic();
           const final = scoreRef.current;
           if (final > highScore) {
             setHighScore(final);
@@ -189,6 +196,8 @@ export default function SnakeGame() {
         // Self collision
         if (snake.some((s) => s.x === head.x && s.y === head.y)) {
           setGameState("over");
+          playSound("gameOver");
+          stopMusic();
           const final = scoreRef.current;
           if (final > highScore) {
             setHighScore(final);
@@ -204,8 +213,9 @@ export default function SnakeGame() {
           scoreRef.current += 10;
           setScore(scoreRef.current);
           foodRef.current = randomFood(snake);
+          playSound("eat");
           // Speed up slightly
-          speedRef.current = Math.max(60, speedRef.current - 1);
+          speedRef.current = Math.max(40, speedRef.current - 1);
         } else {
           snake.pop();
         }
@@ -225,11 +235,13 @@ export default function SnakeGame() {
     nextDirRef.current = "RIGHT";
     foodRef.current = randomFood(getInitialSnake());
     scoreRef.current = 0;
-    speedRef.current = 120;
+    speedRef.current = Math.round(difficultyParams.snakeSpeed / speedMultiplier);
     lastTickRef.current = 0;
     setScore(0);
     setGameState("playing");
-  }, []);
+    playSound("start");
+    startMusic();
+  }, [difficultyParams.snakeSpeed, speedMultiplier, playSound, startMusic]);
 
   const changeDirection = useCallback((newDir: Direction) => {
     const current = dirRef.current;

@@ -7,6 +7,8 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import GameLayout from "@/components/GameLayout";
 import { Button } from "@/components/ui/button";
 import { Play, RotateCcw, Trophy, ChevronLeft, ChevronRight, Crosshair } from "lucide-react";
+import { useGameSettings } from "@/contexts/GameSettingsContext";
+import { useSoundEngine } from "@/hooks/useSoundEngine";
 
 const CANVAS_W = 480;
 const CANVAS_H = 560;
@@ -30,6 +32,9 @@ interface Particle { x: number; y: number; vx: number; vy: number; life: number;
 const ALIEN_COLORS = ["#FF6B6B", "#FF9800", "#4CAF50", "#9C27B0", "#00BCD4"];
 
 export default function SpaceInvadersGame() {
+  const { difficultyParams, speedMultiplier } = useGameSettings();
+  const { playSound, startMusic, stopMusic } = useSoundEngine();
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState<"idle" | "playing" | "over">("idle");
   const [score, setScore] = useState(0);
@@ -91,7 +96,8 @@ export default function SpaceInvadersGame() {
       x: playerRef.current.x + PLAYER_W / 2,
       y: CANVAS_H - 50,
     });
-  }, []);
+    playSound("shoot");
+  }, [playSound]);
 
   const addParticles = useCallback((x: number, y: number, color: string, count: number) => {
     for (let i = 0; i < count; i++) {
@@ -323,6 +329,7 @@ export default function SpaceInvadersGame() {
           scoreRef.current += points;
           setScore(scoreRef.current);
           addParticles(alien.x + ALIEN_W / 2, alien.y + ALIEN_H / 2, ALIEN_COLORS[alien.type], 8);
+          playSound("hit");
 
           // Speed up remaining aliens
           const remaining = aliens.filter((a) => a.alive).length;
@@ -346,8 +353,11 @@ export default function SpaceInvadersGame() {
         setLives(livesRef.current);
         addParticles(px + PLAYER_W / 2, py + PLAYER_H / 2, "#6C63FF", 12);
 
+        playSound("hit");
         if (livesRef.current <= 0) {
           setGameState("over");
+          playSound("gameOver");
+          stopMusic();
           const final = scoreRef.current;
           if (final > highScore) {
             setHighScore(final);
@@ -363,6 +373,8 @@ export default function SpaceInvadersGame() {
     for (const alien of aliveAliens) {
       if (alien.y + ALIEN_H >= py) {
         setGameState("over");
+        playSound("gameOver");
+        stopMusic();
         const final = scoreRef.current;
         if (final > highScore) {
           setHighScore(final);
@@ -378,6 +390,7 @@ export default function SpaceInvadersGame() {
       setWave(waveRef.current);
       aliensRef.current = initAliens(waveRef.current);
       alienBulletsRef.current = [];
+      playSound("levelUp");
     }
 
     // Update particles
@@ -416,7 +429,9 @@ export default function SpaceInvadersGame() {
     setLives(3);
     setWave(1);
     setGameState("playing");
-  }, [initAliens]);
+    playSound("start");
+    startMusic();
+  }, [initAliens, playSound, startMusic]);
 
   useEffect(() => {
     if (gameState === "playing") {

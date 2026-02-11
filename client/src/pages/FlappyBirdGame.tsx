@@ -7,13 +7,15 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import GameLayout from "@/components/GameLayout";
 import { Button } from "@/components/ui/button";
 import { Play, RotateCcw, Trophy } from "lucide-react";
+import { useGameSettings } from "@/contexts/GameSettingsContext";
+import { useSoundEngine } from "@/hooks/useSoundEngine";
 
 const CANVAS_W = 400;
 const CANVAS_H = 600;
 const GRAVITY = 0.45;
 const FLAP_FORCE = -7.5;
 const PIPE_WIDTH = 52;
-const PIPE_GAP = 150;
+const BASE_PIPE_GAP = 150;
 const PIPE_SPEED = 2.5;
 const BIRD_SIZE = 24;
 const PIPE_SPAWN_INTERVAL = 100;
@@ -39,6 +41,10 @@ const COLORS = {
 };
 
 export default function FlappyBirdGame() {
+  const { difficultyParams, speedMultiplier } = useGameSettings();
+  const { playSound, startMusic, stopMusic } = useSoundEngine();
+  const PIPE_GAP = difficultyParams.pipeGap;
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState<"idle" | "playing" | "over">("idle");
   const [score, setScore] = useState(0);
@@ -58,8 +64,9 @@ export default function FlappyBirdGame() {
     if (gameState === "playing") {
       birdRef.current.vel = FLAP_FORCE;
       flapRef.current = true;
+      playSound("jump");
     }
-  }, [gameState]);
+  }, [gameState, playSound]);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -206,6 +213,7 @@ export default function FlappyBirdGame() {
         pipe.scored = true;
         scoreRef.current++;
         setScore(scoreRef.current);
+        playSound("score");
       }
     });
 
@@ -237,12 +245,14 @@ export default function FlappyBirdGame() {
 
   const endGame = useCallback(() => {
     setGameState("over");
+    playSound("gameOver");
+    stopMusic();
     const final = scoreRef.current;
     if (final > highScore) {
       setHighScore(final);
       localStorage.setItem("flappy-highscore", String(final));
     }
-  }, [highScore]);
+  }, [highScore, playSound, stopMusic]);
 
   const startGame = useCallback(() => {
     birdRef.current = { y: CANVAS_H / 2, vel: 0, rotation: 0 };
@@ -251,7 +261,9 @@ export default function FlappyBirdGame() {
     frameRef.current = 0;
     setScore(0);
     setGameState("playing");
-  }, []);
+    playSound("start");
+    startMusic();
+  }, [playSound, startMusic]);
 
   // Game loop effect
   useEffect(() => {

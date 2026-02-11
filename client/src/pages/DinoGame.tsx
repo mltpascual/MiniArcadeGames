@@ -7,6 +7,8 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import GameLayout from "@/components/GameLayout";
 import { Button } from "@/components/ui/button";
 import { Play, RotateCcw, Trophy, ArrowUp, ArrowDown } from "lucide-react";
+import { useGameSettings } from "@/contexts/GameSettingsContext";
+import { useSoundEngine } from "@/hooks/useSoundEngine";
 
 const CANVAS_W = 700;
 const CANVAS_H = 250;
@@ -41,6 +43,9 @@ const COLORS = {
 };
 
 export default function DinoGame() {
+  const { difficultyParams, speedMultiplier } = useGameSettings();
+  const { playSound, startMusic, stopMusic } = useSoundEngine();
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState<"idle" | "playing" | "over">("idle");
   const [score, setScore] = useState(0);
@@ -380,13 +385,15 @@ export default function DinoGame() {
 
   const endGame = useCallback(() => {
     setGameState("over");
+    playSound("gameOver");
+    stopMusic();
     const final = Math.floor(scoreRef.current);
     setScore(final);
     if (final > highScore) {
       setHighScore(final);
       localStorage.setItem("dino-highscore", String(final));
     }
-  }, [highScore]);
+  }, [highScore, playSound, stopMusic]);
 
   const jump = useCallback(() => {
     const dino = dinoRef.current;
@@ -394,18 +401,21 @@ export default function DinoGame() {
       dino.jumping = true;
       dino.vel = JUMP_FORCE;
       dino.ducking = false;
+      playSound("jump");
     }
-  }, []);
+  }, [playSound]);
 
   const startGame = useCallback(() => {
     dinoRef.current = { y: GROUND_Y, vel: 0, jumping: false, ducking: false, legFrame: 0 };
     obstaclesRef.current = [];
     scoreRef.current = 0;
     frameRef.current = 0;
-    speedRef.current = INITIAL_SPEED;
+    speedRef.current = INITIAL_SPEED * speedMultiplier;
     setScore(0);
     setGameState("playing");
-  }, []);
+    playSound("start");
+    startMusic();
+  }, [speedMultiplier, playSound, startMusic]);
 
   // Game loop effect
   useEffect(() => {
