@@ -42,3 +42,4 @@
 - [x] Animated NEW/HOT badges on game cards based on leaderboard data
 - [x] Reset Tutorial option in Settings page
 - [x] Social sharing button on game-over screens (Twitter/X, Facebook, copy link) for all 11 games
+- [x] Fix Memory Match game — card symbols not centered/corrupted on cards (emoji encoding + centering fix)

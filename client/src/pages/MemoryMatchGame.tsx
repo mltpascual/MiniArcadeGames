@@ -19,7 +19,7 @@ const BACKGROUND_COLOR = "#1a1a2e";
 const GAME_ID = "memory-match";
 const HIGH_SCORE_KEY = `pixel-play-${GAME_ID}-highscore`;
 
-const EMOJIS = ["ð", "ð", "ð", "ð", "ð", "ð", "ð¥", "ð¥"];
+const EMOJIS = ["🍎", "🍓", "🍉", "🍒", "🍇", "🍊", "🥝", "🥑"];
 
 const GRID_SIZE = 4;
 const CARD_COUNT = GRID_SIZE * GRID_SIZE;
@@ -130,11 +130,12 @@ export default function MemoryMatchGame() {
       ctx.fill();
       ctx.save();
       ctx.scale(-1, 1); // Flip text back
-      ctx.font = `${card.width * 0.5}px sans-serif`;
+      const fontSize = Math.min(card.width, card.height) * 0.45;
+      ctx.font = `${fontSize}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = "#000";
-      ctx.fillText(card.emoji, 0, 2);
+      ctx.fillText(card.emoji, 0, 0);
       ctx.restore();
     } else { // Face-down
       ctx.fillStyle = ACCENT_COLOR;
