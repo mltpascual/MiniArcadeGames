@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import GameLayout from "@/components/GameLayout";
 import { Button } from "@/components/ui/button";
-import { Play, RotateCcw, Trophy } from "lucide-react";
+import { Play, RotateCcw, Trophy, ArrowUp, ArrowDown } from "lucide-react";
 
 const CANVAS_W = 700;
 const CANVAS_H = 250;
@@ -462,15 +462,15 @@ export default function DinoGame() {
   return (
     <GameLayout title="DINO JUMP" color="indigo">
       {/* Score display */}
-      <div className="flex items-center gap-6 mb-4">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Score</span>
-          <span className="font-pixel text-lg text-arcade-indigo">{String(score).padStart(5, "0")}</span>
+      <div className="flex items-center gap-3 sm:gap-6 mb-3 sm:mb-4">
+        <div className="flex items-center gap-1 sm:gap-2">
+          <span className="text-[10px] sm:text-sm text-muted-foreground">Score</span>
+          <span className="font-pixel text-sm sm:text-lg text-arcade-indigo">{String(score).padStart(5, "0")}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Trophy className="w-4 h-4 text-arcade-coral" />
-          <span className="text-sm text-muted-foreground">Best</span>
-          <span className="font-pixel text-lg text-arcade-coral">{String(highScore).padStart(5, "0")}</span>
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Trophy className="w-3 h-3 sm:w-4 sm:h-4 text-arcade-coral" />
+          <span className="text-[10px] sm:text-sm text-muted-foreground">Best</span>
+          <span className="font-pixel text-sm sm:text-lg text-arcade-coral">{String(highScore).padStart(5, "0")}</span>
         </div>
       </div>
 
@@ -491,14 +491,14 @@ export default function DinoGame() {
 
         {/* Overlay states */}
         {gameState === "idle" && (
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
-            <h2 className="font-pixel text-2xl text-arcade-indigo text-glow-indigo">DINO JUMP</h2>
-            <p className="text-sm text-white/70 text-center px-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center gap-3 sm:gap-4">
+            <h2 className="font-pixel text-xl sm:text-2xl text-arcade-indigo text-glow-indigo">DINO JUMP</h2>
+            <p className="text-xs sm:text-sm text-white/70 text-center px-4">
               Space / Up to jump · Down to duck · Avoid obstacles!
             </p>
             <Button
               onClick={startGame}
-              className="bg-arcade-indigo text-white hover:bg-arcade-indigo/90 font-pixel text-sm gap-2"
+              className="bg-arcade-indigo text-white hover:bg-arcade-indigo/90 font-pixel text-xs sm:text-sm gap-2"
             >
               <Play className="w-4 h-4" /> START
             </Button>
@@ -506,15 +506,15 @@ export default function DinoGame() {
         )}
 
         {gameState === "over" && (
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
-            <h2 className="font-pixel text-2xl text-arcade-coral text-glow-coral">GAME OVER</h2>
-            <p className="font-pixel text-lg text-white">Score: {String(score).padStart(5, "0")}</p>
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-3 sm:gap-4">
+            <h2 className="font-pixel text-xl sm:text-2xl text-arcade-coral text-glow-coral">GAME OVER</h2>
+            <p className="font-pixel text-base sm:text-lg text-white">Score: {String(score).padStart(5, "0")}</p>
             {score >= highScore && score > 0 && (
-              <p className="font-pixel text-sm text-arcade-mint animate-pulse">NEW HIGH SCORE!</p>
+              <p className="font-pixel text-xs sm:text-sm text-arcade-mint animate-pulse">NEW HIGH SCORE!</p>
             )}
             <Button
               onClick={startGame}
-              className="bg-arcade-indigo text-white hover:bg-arcade-indigo/90 font-pixel text-sm gap-2"
+              className="bg-arcade-indigo text-white hover:bg-arcade-indigo/90 font-pixel text-xs sm:text-sm gap-2"
             >
               <RotateCcw className="w-4 h-4" /> RETRY
             </Button>
@@ -522,8 +522,28 @@ export default function DinoGame() {
         )}
       </div>
 
+      {/* Mobile touch controls */}
+      <div className="grid grid-cols-2 gap-3 w-full max-w-xs mt-3 sm:hidden">
+        <Button
+          variant="outline"
+          className="border-arcade-indigo/30 text-arcade-indigo h-14 text-sm font-pixel gap-2"
+          onTouchStart={(e) => { e.preventDefault(); if (gameState === "playing") jump(); }}
+        >
+          <ArrowUp className="w-6 h-6" /> JUMP
+        </Button>
+        <Button
+          variant="outline"
+          className="border-arcade-coral/30 text-arcade-coral h-14 text-sm font-pixel gap-2"
+          onTouchStart={(e) => { e.preventDefault(); if (gameState === "playing") { dinoRef.current.ducking = true; } }}
+          onTouchEnd={(e) => { e.preventDefault(); dinoRef.current.ducking = false; }}
+          onTouchCancel={() => { dinoRef.current.ducking = false; }}
+        >
+          <ArrowDown className="w-6 h-6" /> DUCK
+        </Button>
+      </div>
+
       {/* Controls hint */}
-      <p className="mt-4 text-xs text-muted-foreground text-center">
+      <p className="mt-3 sm:mt-4 text-[10px] sm:text-xs text-muted-foreground text-center hidden sm:block">
         Space / Up Arrow to jump · Down Arrow to duck · Click / Tap to jump
       </p>
     </GameLayout>

@@ -321,15 +321,15 @@ export default function SnakeGame() {
   return (
     <GameLayout title="SNAKE" color="mint">
       {/* Score display */}
-      <div className="flex items-center gap-6 mb-4">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Score</span>
-          <span className="font-pixel text-lg text-arcade-mint">{score}</span>
+      <div className="flex items-center gap-3 sm:gap-6 mb-3 sm:mb-4">
+        <div className="flex items-center gap-1 sm:gap-2">
+          <span className="text-[10px] sm:text-sm text-muted-foreground">Score</span>
+          <span className="font-pixel text-sm sm:text-lg text-arcade-mint">{score}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Trophy className="w-4 h-4 text-arcade-coral" />
-          <span className="text-sm text-muted-foreground">Best</span>
-          <span className="font-pixel text-lg text-arcade-coral">{highScore}</span>
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Trophy className="w-3 h-3 sm:w-4 sm:h-4 text-arcade-coral" />
+          <span className="text-[10px] sm:text-sm text-muted-foreground">Best</span>
+          <span className="font-pixel text-sm sm:text-lg text-arcade-coral">{highScore}</span>
         </div>
       </div>
 
@@ -345,14 +345,14 @@ export default function SnakeGame() {
 
         {/* Overlay states */}
         {gameState === "idle" && (
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
-            <h2 className="font-pixel text-2xl text-arcade-mint text-glow-mint">SNAKE</h2>
-            <p className="text-sm text-white/70 text-center px-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center gap-3 sm:gap-4">
+            <h2 className="font-pixel text-xl sm:text-2xl text-arcade-mint text-glow-mint">SNAKE</h2>
+            <p className="text-xs sm:text-sm text-white/70 text-center px-4">
               Use arrow keys or swipe to control the snake
             </p>
             <Button
               onClick={startGame}
-              className="bg-arcade-mint text-arcade-darker hover:bg-arcade-mint/90 font-pixel text-sm gap-2"
+              className="bg-arcade-mint text-arcade-darker hover:bg-arcade-mint/90 font-pixel text-xs sm:text-sm gap-2"
             >
               <Play className="w-4 h-4" /> START
             </Button>
@@ -360,15 +360,15 @@ export default function SnakeGame() {
         )}
 
         {gameState === "over" && (
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
-            <h2 className="font-pixel text-2xl text-arcade-coral text-glow-coral">GAME OVER</h2>
-            <p className="font-pixel text-lg text-white">Score: {score}</p>
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-3 sm:gap-4">
+            <h2 className="font-pixel text-xl sm:text-2xl text-arcade-coral text-glow-coral">GAME OVER</h2>
+            <p className="font-pixel text-base sm:text-lg text-white">Score: {score}</p>
             {score >= highScore && score > 0 && (
-              <p className="font-pixel text-sm text-arcade-mint animate-pulse">NEW HIGH SCORE!</p>
+              <p className="font-pixel text-xs sm:text-sm text-arcade-mint animate-pulse">NEW HIGH SCORE!</p>
             )}
             <Button
               onClick={startGame}
-              className="bg-arcade-mint text-arcade-darker hover:bg-arcade-mint/90 font-pixel text-sm gap-2"
+              className="bg-arcade-mint text-arcade-darker hover:bg-arcade-mint/90 font-pixel text-xs sm:text-sm gap-2"
             >
               <RotateCcw className="w-4 h-4" /> RETRY
             </Button>
@@ -377,48 +377,44 @@ export default function SnakeGame() {
       </div>
 
       {/* Mobile D-pad controls */}
-      <div className="mt-6 grid grid-cols-3 gap-2 w-40 sm:hidden">
+      <div className="mt-4 grid grid-cols-3 gap-2 w-48 sm:hidden">
         <div />
         <Button
           variant="outline"
-          size="icon"
-          className="border-arcade-mint/30 text-arcade-mint"
+          className="border-arcade-mint/30 text-arcade-mint h-14 w-full"
           onTouchStart={(e) => { e.preventDefault(); changeDirection("UP"); }}
         >
-          <ChevronUp className="w-5 h-5" />
+          <ChevronUp className="w-7 h-7" />
         </Button>
         <div />
         <Button
           variant="outline"
-          size="icon"
-          className="border-arcade-mint/30 text-arcade-mint"
+          className="border-arcade-mint/30 text-arcade-mint h-14 w-full"
           onTouchStart={(e) => { e.preventDefault(); changeDirection("LEFT"); }}
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-7 h-7" />
         </Button>
         <div />
         <Button
           variant="outline"
-          size="icon"
-          className="border-arcade-mint/30 text-arcade-mint"
+          className="border-arcade-mint/30 text-arcade-mint h-14 w-full"
           onTouchStart={(e) => { e.preventDefault(); changeDirection("RIGHT"); }}
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight className="w-7 h-7" />
         </Button>
         <div />
         <Button
           variant="outline"
-          size="icon"
-          className="border-arcade-mint/30 text-arcade-mint"
+          className="border-arcade-mint/30 text-arcade-mint h-14 w-full"
           onTouchStart={(e) => { e.preventDefault(); changeDirection("DOWN"); }}
         >
-          <ChevronDown className="w-5 h-5" />
+          <ChevronDown className="w-7 h-7" />
         </Button>
         <div />
       </div>
 
       {/* Controls hint */}
-      <p className="mt-4 text-xs text-muted-foreground text-center hidden sm:block">
+      <p className="mt-4 text-[10px] sm:text-xs text-muted-foreground text-center hidden sm:block">
         Arrow keys or WASD to move · Space to start/restart
       </p>
     </GameLayout>

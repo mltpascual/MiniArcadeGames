@@ -293,15 +293,15 @@ export default function FlappyBirdGame() {
   return (
     <GameLayout title="FLAPPY BIRD" color="coral">
       {/* Score display */}
-      <div className="flex items-center gap-6 mb-4">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Score</span>
-          <span className="font-pixel text-lg text-arcade-coral">{score}</span>
+      <div className="flex items-center gap-3 sm:gap-6 mb-3 sm:mb-4">
+        <div className="flex items-center gap-1 sm:gap-2">
+          <span className="text-[10px] sm:text-sm text-muted-foreground">Score</span>
+          <span className="font-pixel text-sm sm:text-lg text-arcade-coral">{score}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Trophy className="w-4 h-4 text-arcade-mint" />
-          <span className="text-sm text-muted-foreground">Best</span>
-          <span className="font-pixel text-lg text-arcade-mint">{highScore}</span>
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Trophy className="w-3 h-3 sm:w-4 sm:h-4 text-arcade-mint" />
+          <span className="text-[10px] sm:text-sm text-muted-foreground">Best</span>
+          <span className="font-pixel text-sm sm:text-lg text-arcade-mint">{highScore}</span>
         </div>
       </div>
 
@@ -322,14 +322,14 @@ export default function FlappyBirdGame() {
 
         {/* Overlay states */}
         {gameState === "idle" && (
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
-            <h2 className="font-pixel text-2xl text-arcade-coral text-glow-coral">FLAPPY BIRD</h2>
-            <p className="text-sm text-white/70 text-center px-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center gap-3 sm:gap-4">
+            <h2 className="font-pixel text-xl sm:text-2xl text-arcade-coral text-glow-coral">FLAPPY BIRD</h2>
+            <p className="text-xs sm:text-sm text-white/70 text-center px-4">
               Tap, click, or press Space to flap
             </p>
             <Button
               onClick={startGame}
-              className="bg-arcade-coral text-white hover:bg-arcade-coral/90 font-pixel text-sm gap-2"
+              className="bg-arcade-coral text-white hover:bg-arcade-coral/90 font-pixel text-xs sm:text-sm gap-2"
             >
               <Play className="w-4 h-4" /> START
             </Button>
@@ -337,15 +337,15 @@ export default function FlappyBirdGame() {
         )}
 
         {gameState === "over" && (
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
-            <h2 className="font-pixel text-2xl text-arcade-coral text-glow-coral">GAME OVER</h2>
-            <p className="font-pixel text-lg text-white">Score: {score}</p>
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center gap-3 sm:gap-4">
+            <h2 className="font-pixel text-xl sm:text-2xl text-arcade-coral text-glow-coral">GAME OVER</h2>
+            <p className="font-pixel text-base sm:text-lg text-white">Score: {score}</p>
             {score >= highScore && score > 0 && (
-              <p className="font-pixel text-sm text-arcade-mint animate-pulse">NEW HIGH SCORE!</p>
+              <p className="font-pixel text-xs sm:text-sm text-arcade-mint animate-pulse">NEW HIGH SCORE!</p>
             )}
             <Button
               onClick={startGame}
-              className="bg-arcade-coral text-white hover:bg-arcade-coral/90 font-pixel text-sm gap-2"
+              className="bg-arcade-coral text-white hover:bg-arcade-coral/90 font-pixel text-xs sm:text-sm gap-2"
             >
               <RotateCcw className="w-4 h-4" /> RETRY
             </Button>
@@ -354,7 +354,7 @@ export default function FlappyBirdGame() {
       </div>
 
       {/* Controls hint */}
-      <p className="mt-4 text-xs text-muted-foreground text-center">
+      <p className="mt-3 sm:mt-4 text-[10px] sm:text-xs text-muted-foreground text-center">
         Space / Click / Tap to flap · Space to start/restart
       </p>
     </GameLayout>

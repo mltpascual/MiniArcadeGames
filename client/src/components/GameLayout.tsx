@@ -62,7 +62,7 @@ export default function GameLayout({ title, color, children }: GameLayoutProps) 
       </nav>
 
       {/* Game Area */}
-      <main className="flex-1 flex flex-col items-center justify-center p-4">
+      <main className="flex-1 flex flex-col items-center justify-center p-2 sm:p-4">
         {children}
       </main>
     </div>

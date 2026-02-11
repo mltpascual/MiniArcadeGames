@@ -8,6 +8,9 @@ import Home from "./pages/Home";
 import SnakeGame from "./pages/SnakeGame";
 import FlappyBirdGame from "./pages/FlappyBirdGame";
 import DinoGame from "./pages/DinoGame";
+import TetrisGame from "./pages/TetrisGame";
+import PongGame from "./pages/PongGame";
+import SpaceInvadersGame from "./pages/SpaceInvadersGame";
 
 function Router() {
   return (
@@ -16,6 +19,9 @@ function Router() {
       <Route path={"/snake"} component={SnakeGame} />
       <Route path={"/flappy-bird"} component={FlappyBirdGame} />
       <Route path={"/dino-jump"} component={DinoGame} />
+      <Route path={"/tetris"} component={TetrisGame} />
+      <Route path={"/pong"} component={PongGame} />
+      <Route path={"/space-invaders"} component={SpaceInvadersGame} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
