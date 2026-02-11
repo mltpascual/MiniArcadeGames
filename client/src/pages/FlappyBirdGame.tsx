@@ -10,6 +10,8 @@ import { Play, RotateCcw, Trophy, Pause } from "lucide-react";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
+import GameTutorial from "@/components/GameTutorial";
+import { tutorials } from "@/data/tutorialData";
 
 const CANVAS_W = 400;
 const CANVAS_H = 600;
@@ -323,6 +325,7 @@ export default function FlappyBirdGame() {
 
   return (
     <GameLayout title="FLAPPY BIRD" color="coral">
+      <GameTutorial {...tutorials.flappy} />
       {/* Score display */}
       <div className="flex items-center gap-3 sm:gap-6 mb-3 sm:mb-4">
         <div className="flex items-center gap-1 sm:gap-2">

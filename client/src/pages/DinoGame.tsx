@@ -10,6 +10,8 @@ import { Play, RotateCcw, Trophy, ArrowUp, ArrowDown, Pause } from "lucide-react
 import { useGameSettings } from "@/contexts/GameSettingsContext";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
+import GameTutorial from "@/components/GameTutorial";
+import { tutorials } from "@/data/tutorialData";
 
 const CANVAS_W = 700;
 const CANVAS_H = 250;
@@ -490,6 +492,7 @@ export default function DinoGame() {
 
   return (
     <GameLayout title="DINO JUMP" color="indigo">
+      <GameTutorial {...tutorials.dino} />
       {/* Score display */}
       <div className="flex items-center gap-3 sm:gap-6 mb-3 sm:mb-4">
         <div className="flex items-center gap-1 sm:gap-2">

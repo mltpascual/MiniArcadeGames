@@ -10,6 +10,8 @@ import { Play, RotateCcw, Trophy, ChevronLeft, ChevronRight, Crosshair, Pause } 
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
+import GameTutorial from "@/components/GameTutorial";
+import { tutorials } from "@/data/tutorialData";
 
 const CANVAS_W = 480;
 const CANVAS_H = 560;
@@ -529,6 +531,7 @@ export default function SpaceInvadersGame() {
 
   return (
     <GameLayout title="SPACE INVADERS" color="indigo">
+      <GameTutorial {...tutorials.invaders} />
       <div className="flex flex-col items-center gap-3 sm:gap-4 w-full">
         {/* Score bar */}
         <div className="flex items-center gap-3 sm:gap-6 flex-wrap justify-center">

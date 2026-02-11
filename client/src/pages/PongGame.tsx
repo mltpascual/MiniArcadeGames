@@ -10,6 +10,8 @@ import { Play, RotateCcw, Trophy, Pause } from "lucide-react";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
+import GameTutorial from "@/components/GameTutorial";
+import { tutorials } from "@/data/tutorialData";
 
 const CANVAS_W = 600;
 const CANVAS_H = 400;
@@ -351,6 +353,7 @@ export default function PongGame() {
 
   return (
     <GameLayout title="PONG" color="mint">
+      <GameTutorial {...tutorials.pong} />
       <div className="flex flex-col items-center gap-3 sm:gap-4 w-full">
         {/* Score bar */}
         <div className="flex items-center gap-4 sm:gap-8">

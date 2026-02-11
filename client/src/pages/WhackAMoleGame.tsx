@@ -4,6 +4,8 @@ import { Play, RotateCcw, Pause } from "lucide-react";
 import GameLayout from "@/components/GameLayout";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
+import GameTutorial from "@/components/GameTutorial";
+import { tutorials } from "@/data/tutorialData";
 
 const ACCENT_COLOR = "#4ECDC4";
 const GAME_ID = "whack-a-mole";
@@ -337,6 +339,7 @@ export default function WhackAMoleGame() {
 
   return (
     <GameLayout title="Whack-a-Mole" color="mint">
+    <GameTutorial {...tutorials["whack-a-mole"]} />
     <div className="flex flex-col items-center justify-center">
       <div className="flex items-center gap-4 mb-2 text-white text-sm">
         <span>Score: {score}</span>

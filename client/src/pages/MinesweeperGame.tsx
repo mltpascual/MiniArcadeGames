@@ -4,6 +4,8 @@ import { Play, RotateCcw, Pause, Flag, Bomb } from "lucide-react";
 import GameLayout from "@/components/GameLayout";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
+import GameTutorial from "@/components/GameTutorial";
+import { tutorials } from "@/data/tutorialData";
 
 const ACCENT_COLOR = "#4ECDC4";
 const GAME_ID = "minesweeper";
@@ -397,6 +399,7 @@ const MinesweeperGame = () => {
 
   return (
     <GameLayout title="Minesweeper" color="mint">
+    <GameTutorial {...tutorials.minesweeper} />
     <div className="flex flex-col items-center justify-center touch-none" onContextMenu={(e) => e.preventDefault()}>
 
       <div className="flex items-center gap-4 mb-2 text-white text-sm font-pixel">

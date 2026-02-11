@@ -10,6 +10,8 @@ import { Play, RotateCcw, Trophy, RotateCw, ChevronDown, ChevronLeft, ChevronRig
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
 import { useGameSettings } from "@/contexts/GameSettingsContext";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
+import GameTutorial from "@/components/GameTutorial";
+import { tutorials } from "@/data/tutorialData";
 
 const COLS = 10;
 const ROWS = 20;
@@ -409,6 +411,7 @@ export default function TetrisGame() {
 
   return (
     <GameLayout title="TETRIS" color="coral">
+      <GameTutorial {...tutorials.tetris} />
       <div className="flex flex-col items-center gap-3 sm:gap-4 w-full max-w-lg">
         {/* Score bar */}
         <div className="flex items-center gap-3 sm:gap-6 flex-wrap justify-center">

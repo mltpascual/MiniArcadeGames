@@ -10,6 +10,8 @@ import { Play, RotateCcw, Trophy, ChevronUp, ChevronDown, ChevronLeft, ChevronRi
 import { useGameSettings } from "@/contexts/GameSettingsContext";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
+import GameTutorial from "@/components/GameTutorial";
+import { tutorials } from "@/data/tutorialData";
 
 const CELL_SIZE = 20;
 const GRID_W = 20;
@@ -356,6 +358,7 @@ export default function SnakeGame() {
 
   return (
     <GameLayout title="SNAKE" color="mint">
+      <GameTutorial {...tutorials.snake} />
       {/* Score display */}
       <div className="flex items-center gap-3 sm:gap-6 mb-3 sm:mb-4">
         <div className="flex items-center gap-1 sm:gap-2">

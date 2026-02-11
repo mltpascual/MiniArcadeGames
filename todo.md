@@ -33,3 +33,7 @@
 - [x] Routes and navigation for all new games
 - [x] Fix game canvas too small on desktop — make games fill more screen space
 - [x] Fix Memory Match infinite re-render loop (Maximum update depth exceeded)
+- [x] Create DESIGN.md using the design-md skill
+- [x] Search bar on homepage to filter games by name
+- [x] Category filter tabs (All, Classic, Puzzle, Action, Brain, Reflex) on homepage
+- [x] Game tutorial overlay on first play for all 11 games

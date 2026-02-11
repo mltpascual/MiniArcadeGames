@@ -4,6 +4,8 @@ import { Play, RotateCcw, Pause } from "lucide-react";
 import GameLayout from "@/components/GameLayout";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
+import GameTutorial from "@/components/GameTutorial";
+import { tutorials } from "@/data/tutorialData";
 
 const ACCENT_COLOR = "#7C5CFC";
 const GAME_ID = "2048";
@@ -297,6 +299,7 @@ export default function Game2048() {
         };
     }, [draw]);    return (
         <GameLayout title="2048" color="indigo">
+        <GameTutorial {...tutorials["2048"]} />
         <div className="flex flex-col items-center justify-center font-pixel">    <h1 className="font-pixel text-lg sm:text-xl mb-4" style={{color: ACCENT_COLOR}}>2048</h1>
             <div className="flex items-center gap-4 mb-2 text-white text-sm">
                 <span>Score: {score}</span>

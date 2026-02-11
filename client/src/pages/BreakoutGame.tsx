@@ -9,6 +9,8 @@ import { Play, RotateCcw, Pause } from "lucide-react";
 import GameLayout from "@/components/GameLayout";
 import { useSoundEngine } from "@/hooks/useSoundEngine";
 import { useScoreSubmit } from "@/hooks/useScoreSubmit";
+import GameTutorial from "@/components/GameTutorial";
+import { tutorials } from "@/data/tutorialData";
 
 const ACCENT_COLOR = "#FF6B6B";
 const GAME_ID = "breakout";
@@ -290,6 +292,7 @@ export default function BreakoutGame() {
 
   return (
     <GameLayout title="Breakout" color="coral">
+    <GameTutorial {...tutorials.breakout} />
     <div className="flex flex-col items-center justify-center text-white font-pixel">
       <div className="flex items-center gap-4 mb-2 text-sm">
         <span>Score: {score}</span>

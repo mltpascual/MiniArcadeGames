@@ -6,9 +6,10 @@
  * - Silkscreen pixel font for headings, Outfit for body
  */
 import { useAuth } from "@/_core/hooks/useAuth";
-import { motion } from "framer-motion";
+import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
-import { Gamepad2, Zap, Settings, Trophy, Award, User } from "lucide-react";
+import { Gamepad2, Zap, Settings, Trophy, Award, User, Search, X } from "lucide-react";
 
 const HERO_IMG = "https://private-us-east-1.manuscdn.com/sessionFile/47LZSGYqN22BYCYAxPiaxL/sandbox/2gvGaXiIcbq5AtvP2rclMh-img-1_1770800508000_na1fn_aGVyby1hcmNhZGU.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvNDdMWlNHWXFOMjJCWUNZQXhQaWF4TC9zYW5kYm94LzJndkdhWGlJY2JxNUF0dlAycmNsTWgtaW1nLTFfMTc3MDgwMDUwODAwMF9uYTFmbl9hR1Z5YnkxaGNtTmhaR1UucG5nP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTkyMCxoXzE5MjAvZm9ybWF0LHdlYnAvcXVhbGl0eSxxXzgwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=nTbEBvwm5ChOvub7wedCQMyEBwIAY9Yq6ObAudIcHubjRSNUGOF89zeR6Ao20c7Er100ntL-zXZOOBUy1NhIx9AHVwmtCye7YSJZ2Jo4SQuAdgY5O~H6Mo08PhHf8Eebxu8v33ynfQggloMlk9cDoxQKd4nmxE-0lApXya4BsIaiy56QlGU0NZotn189Odye82Zs14FwXhx6b6EcqLXBuS-LlrJhVPrJcIk8BpOT4TWAV~uHebM-cDwvwqZb~BrmrbN7EMHoLTv4IB5hM9BVeOr10e96vW3uVOaaBboj5-PJ4W49jCIfBD3L7tOnljZDcPt0fLvP3dLXbfaS5JJTFg__";
 
@@ -136,6 +137,28 @@ const games = [
   },
 ];
 
+const categories = [
+  { id: "all", label: "ALL", color: "text-foreground" },
+  { id: "classic", label: "CLASSIC", color: "text-arcade-mint" },
+  { id: "puzzle", label: "PUZZLE", color: "text-arcade-indigo" },
+  { id: "action", label: "ACTION", color: "text-arcade-coral" },
+  { id: "brain", label: "BRAIN", color: "text-arcade-coral" },
+  { id: "reflex", label: "REFLEX", color: "text-arcade-mint" },
+];
+
+const gameCategoryMap: Record<string, string> = {
+  "Classic": "classic",
+  "Addictive": "classic",
+  "Endless": "action",
+  "Puzzle": "puzzle",
+  "Versus": "action",
+  "Shooter": "action",
+  "Strategy": "puzzle",
+  "Action": "action",
+  "Brain": "brain",
+  "Reflex": "reflex",
+};
+
 const colorMap = {
   mint: {
     border: "border-arcade-mint/30",
@@ -193,6 +216,20 @@ export default function Home() {
   // The userAuth hooks provides authentication state
   // To implement login/logout functionality, simply call logout() or redirect to getLoginUrl()
   let { user, loading, error, isAuthenticated, logout } = useAuth();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState("all");
+
+  const filteredGames = useMemo(() => {
+    return games.filter((game) => {
+      const matchesSearch = searchQuery === "" ||
+        game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        game.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        game.tag.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = activeCategory === "all" ||
+        gameCategoryMap[game.tag] === activeCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchQuery, activeCategory]);
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
@@ -288,29 +325,95 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Search & Filter Section */}
+      <section className="relative z-10 pt-4 sm:pt-6 md:pt-8">
+        <div className="container">
+          {/* Search Bar */}
+          <div className="relative mb-4 sm:mb-6">
+            <div className="relative">
+              <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search games..."
+                className="w-full pl-10 sm:pl-12 pr-10 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-card border border-border/50 text-foreground placeholder:text-muted-foreground text-sm sm:text-base font-medium focus:outline-none focus:border-arcade-indigo/50 focus:ring-1 focus:ring-arcade-indigo/20 transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-muted-foreground/20 flex items-center justify-center hover:bg-muted-foreground/30 transition-colors"
+                >
+                  <X className="w-3 h-3 text-muted-foreground" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Category Tabs */}
+          <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-hide mb-2 sm:mb-4">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`font-pixel text-[10px] sm:text-xs px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg whitespace-nowrap transition-all duration-200 border ${
+                  activeCategory === cat.id
+                    ? "bg-arcade-indigo/20 border-arcade-indigo/40 text-arcade-indigo"
+                    : "bg-card border-border/30 text-muted-foreground hover:border-border hover:text-foreground"
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Games Grid */}
       <section className="relative z-10 py-4 sm:py-8 md:py-12">
         <div className="container">
           <motion.div
-            className="flex items-center gap-3 mb-4 sm:mb-8"
+            className="flex items-center justify-between gap-3 mb-4 sm:mb-8"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <div className="w-1 h-6 sm:h-8 bg-arcade-coral rounded-full" />
-            <h2 className="font-pixel text-base sm:text-lg md:text-xl text-foreground">SELECT GAME</h2>
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-6 sm:h-8 bg-arcade-coral rounded-full" />
+              <h2 className="font-pixel text-base sm:text-lg md:text-xl text-foreground">
+                {activeCategory === "all" && !searchQuery ? "SELECT GAME" : `${filteredGames.length} GAME${filteredGames.length !== 1 ? "S" : ""} FOUND`}
+              </h2>
+            </div>
           </motion.div>
 
+          {filteredGames.length === 0 ? (
+            <motion.div
+              className="text-center py-16 sm:py-24"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <Gamepad2 className="w-12 h-12 sm:w-16 sm:h-16 text-muted-foreground/30 mx-auto mb-4" />
+              <p className="font-pixel text-sm sm:text-base text-muted-foreground mb-2">NO GAMES FOUND</p>
+              <p className="text-xs sm:text-sm text-muted-foreground/60">Try a different search or category</p>
+              <button
+                onClick={() => { setSearchQuery(""); setActiveCategory("all"); }}
+                className="mt-4 px-4 py-2 rounded-lg bg-arcade-indigo/20 text-arcade-indigo font-pixel text-xs hover:bg-arcade-indigo/30 transition-colors"
+              >
+                CLEAR FILTERS
+              </button>
+            </motion.div>
+          ) : (
           <motion.div
             className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
           >
-            {games.map((game) => {
+            <AnimatePresence mode="popLayout">
+                   {filteredGames.map((game) => {
               const colors = colorMap[game.color];
               return (
-                <motion.div key={game.id} variants={itemVariants}>
+                <motion.div key={game.id} variants={itemVariants} layout>
                   <Link href={game.path}>
                     <motion.div
                       className={`group relative rounded-lg sm:rounded-xl border ${colors.border} ${colors.hoverBorder} bg-card overflow-hidden transition-colors duration-300 h-full`}
@@ -358,7 +461,9 @@ export default function Home() {
                 </motion.div>
               );
             })}
+            </AnimatePresence>
           </motion.div>
+          )}
         </div>
       </section>
 
