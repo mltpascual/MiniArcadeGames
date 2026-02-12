@@ -1,0 +1,302 @@
+openapi: 3.1.0
+info:
+  title: Pixel Playground API
+  description: tRPC-based API for the Pixel Playground mini games arcade
+  version: 1.0.0
+servers:
+  - url: /api/trpc
+    description: tRPC endpoint (batched HTTP)
+
+paths:
+  /auth.me:
+    get:
+      summary: Get current user session
+      tags: [Auth]
+      security: []
+      responses:
+        '200':
+          description: Current user or null if not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOrNull'
+
+  /auth.logout:
+    post:
+      summary: Clear session cookie and log out
+      tags: [Auth]
+      security: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+
+  /leaderboard.getTopScores:
+    get:
+      summary: Get top scores for a game
+      tags: [Leaderboard]
+      security: []
+      parameters:
+        - name: game
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/GameId'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        '200':
+          description: Array of top scores with user info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScoreWithUser'
+
+  /leaderboard.submitScore:
+    post:
+      summary: Submit a game score
+      tags: [Leaderboard]
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [game, score]
+              properties:
+                game:
+                  $ref: '#/components/schemas/GameId'
+                score:
+                  type: integer
+                  minimum: 0
+                wave:
+                  type: integer
+                lines:
+                  type: integer
+      responses:
+        '200':
+          description: Score submitted with achievement unlocks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scoreId:
+                    type: integer
+                  newAchievements:
+                    type: array
+                    items:
+                      type: string
+
+  /leaderboard.getUserBestScore:
+    get:
+      summary: Get user's best score for a game
+      tags: [Leaderboard]
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: game
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/GameId'
+      responses:
+        '200':
+          description: User's best score or null
+
+  /leaderboard.getUserAllBestScores:
+    get:
+      summary: Get user's best scores across all games
+      tags: [Leaderboard]
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Array of best scores per game
+
+  /leaderboard.getUserRecentScores:
+    get:
+      summary: Get user's recent score history
+      tags: [Leaderboard]
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Array of recent scores
+
+  /leaderboard.getUserTotalGamesPlayed:
+    get:
+      summary: Get total games played count
+      tags: [Leaderboard]
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Total count
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+
+  /leaderboard.getUserGameStats:
+    get:
+      summary: Get per-game play statistics
+      tags: [Leaderboard]
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Array of per-game stats
+
+  /leaderboard.getGamePlayCounts:
+    get:
+      summary: Get play counts per game for badge calculation
+      tags: [Leaderboard]
+      security: []
+      responses:
+        '200':
+          description: Array of game play counts
+
+  /achievements.getUserAchievements:
+    get:
+      summary: Get user's unlocked achievements
+      tags: [Achievements]
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Array of achievement IDs with unlock timestamps
+
+  /favorites.getUserFavorites:
+    get:
+      summary: Get user's favorited game IDs
+      tags: [Favorites]
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Array of favorited game IDs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /favorites.toggleFavorite:
+    post:
+      summary: Add or remove a game from favorites
+      tags: [Favorites]
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [gameId]
+              properties:
+                gameId:
+                  $ref: '#/components/schemas/GameId'
+      responses:
+        '200':
+          description: Updated favorite status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  favorited:
+                    type: boolean
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: session
+
+  schemas:
+    GameId:
+      type: string
+      enum:
+        - snake
+        - flappy-bird
+        - dino-jump
+        - tetris
+        - pong
+        - space-invaders
+        - minesweeper
+        - breakout
+        - "2048"
+        - memory-match
+        - whack-a-mole
+
+    UserOrNull:
+      oneOf:
+        - $ref: '#/components/schemas/User'
+        - type: "null"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        openId:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [user, admin]
+        createdAt:
+          type: string
+          format: date-time
+
+    ScoreWithUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        game:
+          type: string
+        score:
+          type: integer
+        wave:
+          type: integer
+        lines:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        userName:
+          type: string

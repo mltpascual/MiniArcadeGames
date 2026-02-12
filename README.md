@@ -69,8 +69,8 @@ Before running the project locally, ensure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/mini-games-arcade.git
-cd mini-games-arcade
+git clone https://github.com/mltpascual/MiniArcadeGames.git
+cd MiniArcadeGames
 ```
 
 ### 2. Install Dependencies
@@ -448,6 +448,20 @@ Browsers require a user interaction before playing audio. The sound engine initi
 ### Tutorial not showing
 
 Tutorials are shown once per game and the seen-state is stored in `localStorage`. To reset tutorials, go to Settings and use the "Reset Tutorial" section, or clear your browser's localStorage for the site.
+
+---
+
+## Documentation
+
+The project includes comprehensive documentation generated via the master orchestrator:
+
+| Document | Path | Description |
+|----------|------|-------------|
+| **Design System** | `DESIGN.md` | Colors, typography, components, spacing, animations |
+| **Development Guidelines** | `DEVELOPMENT_GUIDELINES.md` | Coding standards, UI/UX, security, testing policies |
+| **Deployment Guide** | `DEPLOYMENT.md` | Step-by-step Vercel deployment instructions |
+| **C4 Architecture** | `C4-Documentation/` | System context, containers, components, and API spec |
+| **Project Context** | `conductor/` | Product vision, tech stack, workflow, and tracks |
 
 ---
 
