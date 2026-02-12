@@ -18,5 +18,4 @@ coverage/
 DESIGN.md
 DEPLOYMENT.md
 
-# Patches and config
-patches/
+# Note: patches/ must NOT be ignored — pnpm install requires it
