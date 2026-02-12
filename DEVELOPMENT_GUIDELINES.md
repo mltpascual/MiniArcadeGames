@@ -40,7 +40,6 @@ The project follows a **neo-retro "Pixel Playground"** aesthetic — dark charco
 | **Buttons** | Use `variant` and `size` props. Always include `focus-visible` ring. Add loading spinner via `disabled` state during mutations. |
 | **Cards** | Use the `Card` component for game tiles. Apply hover transforms and glow effects via Tailwind utilities, not inline styles. |
 | **Dialogs/Modals** | Use Radix Dialog. Always include keyboard dismiss (ESC) and backdrop click. |
-| **Forms** | Use `react-hook-form` with `zod` resolvers. Show inline validation errors. Use proper `autocomplete` attributes. |
 | **Toast** | Use `sonner` for all transient notifications. Keep messages under 80 characters. |
 
 ### 1.3 Layout and Responsiveness
@@ -93,71 +92,79 @@ The app supports dark and light themes via `ThemeProvider` (default: dark). All 
 
 *Synthesized from: clean-code, code-reviewer*
 
-### 2.1 Naming Conventions
+### 2.1 Architecture — Client-Side Only
+
+This project is a **fully client-side static SPA**. There is no server, no database, and no authentication layer. All data persistence uses **localStorage**.
+
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| UI Framework | React 19 + TypeScript | Component rendering and state management |
+| Styling | Tailwind CSS 4 + shadcn/ui | Design system and component library |
+| Build Tool | Vite | Development server and production bundling |
+| Data Persistence | localStorage | Scores, achievements, favorites, settings |
+| Routing | Wouter | Client-side SPA routing |
+| Deployment | Static hosting (Vercel, Netlify, GitHub Pages) | No server runtime required |
+
+### 2.2 Naming Conventions
 
 | Element | Convention | Example |
 |---------|-----------|---------|
 | Components | PascalCase | `GameTutorial`, `ShareScore` |
 | Hooks | camelCase with `use` prefix | `useScoreSubmit`, `useSoundEngine` |
 | Constants | UPPER_SNAKE_CASE | `VALID_GAMES`, `NEW_GAMES` |
-| Types/Interfaces | PascalCase | `Score`, `InsertUser` |
+| Types/Interfaces | PascalCase | `ScoreEntry`, `AchievementEntry` |
 | Files (components) | PascalCase.tsx | `SnakeGame.tsx` |
-| Files (utilities) | camelCase.ts | `tutorialData.ts` |
-| Database columns | camelCase | `userId`, `createdAt` |
-| API routes | camelCase | `submitScore`, `getLeaderboard` |
+| Files (utilities) | camelCase.ts | `tutorialData.ts`, `gameStore.ts` |
 
 **Rules:**
 - Use intention-revealing names: `elapsedTimeInDays` not `d`.
 - Function names should be verbs: `submitScore`, `toggleFavorite`.
-- Boolean variables should read as questions: `isAuthenticated`, `hasPlayed`.
+- Boolean variables should read as questions: `isFavorite`, `hasPlayed`.
 - Avoid abbreviations unless universally understood (`id`, `url`, `api`).
 
-### 2.2 Functions and Components
+### 2.3 Functions and Components
 
 **Keep functions small and focused.** Each function should do one thing.
 
 - React components: under 200 lines. Split into sub-components when exceeding this.
-- tRPC router files: under 150 lines. Split into `server/routers/<feature>.ts` when growing.
-- Helper functions in `db.ts`: pure data access, no business logic.
-- Procedures in `routers.ts`: orchestrate helpers, validate input, return results.
+- Game pages are an exception — canvas-based games may be longer due to game loop logic.
+- Helper functions in `gameStore.ts`: pure data access, no UI logic.
 
 **Rules:**
 - Limit function arguments to 3 or fewer. Use an options object for more.
 - Never call `setState` or navigation in the render phase — wrap in `useEffect`.
 - Use `useRef` for game state that changes during `requestAnimationFrame` loops to avoid re-renders.
-- Stabilize query inputs with `useState` or `useMemo` to prevent infinite re-fetch loops.
+- Stabilize references with `useState` or `useMemo` to prevent infinite re-render loops.
 
-### 2.3 Error Handling
+### 2.4 Error Handling
 
-- Use `try/catch` at the procedure level in tRPC routers.
-- Throw `TRPCError` with appropriate codes (`NOT_FOUND`, `FORBIDDEN`, `BAD_REQUEST`).
-- Frontend: handle `isLoading`, `isError`, and empty states in every component that fetches data.
-- Show user-friendly error messages via toast — never expose stack traces.
-- Use `ErrorBoundary` at the app level to catch unhandled React errors.
+- Use `try/catch` in localStorage operations (see `gameStore.ts` `getJSON` helper).
+- Handle empty states in every component that reads data (no scores yet, no achievements, etc.).
+- Show user-friendly messages via toast — never expose stack traces.
+- Game canvases should gracefully handle edge cases (window resize, focus loss, etc.).
 
-### 2.4 TypeScript
+### 2.5 TypeScript
 
 - Enable `strict` mode. Never use `any` — define proper types.
-- Infer database types from Drizzle schema: `typeof users.$inferSelect`.
-- Use Zod schemas for all tRPC input validation — types flow end-to-end.
-- Export shared types from `shared/types.ts` for client-server contracts.
+- Export shared types from `shared/types.ts` and `client/src/lib/gameStore.ts`.
+- Use Zod schemas for any form validation.
 
-### 2.5 Code Organization
+### 2.6 Code Organization
 
 ```
 Feature implementation order:
-1. Schema (drizzle/schema.ts) → pnpm db:push
-2. Query helpers (server/db.ts)
-3. tRPC procedures (server/routers.ts)
+1. Data types (shared/types.ts or gameStore.ts)
+2. localStorage helpers (client/src/lib/gameStore.ts)
+3. Hooks (client/src/hooks/*.ts)
 4. Frontend UI (client/src/pages/*.tsx)
-5. Tests (server/*.test.ts)
+5. Tests (client/src/lib/*.test.ts)
 ```
 
-- Keep related code close together. A feature's backend and frontend should be developed in sequence.
+- Keep related code close together.
 - Extract reusable UI into `client/src/components/`.
 - Extract shared logic into `client/src/hooks/`.
 - Static data belongs in `client/src/data/`.
-- Never import server code from client code or vice versa — use `shared/` for cross-boundary types.
+- Game-specific logic stays within the game page file.
 
 ---
 
@@ -165,56 +172,30 @@ Feature implementation order:
 
 *Synthesized from: api-security-best-practices, find-bugs*
 
-### 3.1 Authentication and Authorization
+### 3.1 Client-Side Security Considerations
 
-| Principle | Implementation |
-|-----------|---------------|
-| Session management | JWT-signed cookies via `server/_core/cookies.ts` |
-| Protected routes | Use `protectedProcedure` for any user-specific data |
-| Admin routes | Check `ctx.user.role === 'admin'` in procedure middleware |
-| Frontend auth | Use `useAuth()` hook — never manipulate cookies directly |
-| OAuth redirects | Always use `window.location.origin` — never hardcode domains |
+Since this is a fully client-side app, the security model is different from a server-rendered application. All data is stored in the user's browser and is inherently user-modifiable.
+
+| Concern | Approach |
+|---------|----------|
+| Data integrity | localStorage scores are local-only — no competitive leaderboard to exploit |
+| XSS | React auto-escapes JSX. Never use `dangerouslySetInnerHTML`. |
+| Dependencies | Keep dependencies up to date. Run `pnpm audit` regularly. |
+| Secrets | No API keys or secrets in the codebase — this is a static app. |
+| Content Security | Use CSP headers via deployment platform (Vercel headers, etc.). |
 
 ### 3.2 Input Validation
 
-- **Validate all inputs** using Zod schemas in tRPC procedure `.input()`.
-- Validate game IDs against the `VALID_GAMES` array — never trust client-provided game slugs.
-- Validate score values are non-negative integers.
-- Sanitize any user-generated text before storing or displaying.
+- Validate all user inputs (player name, settings) before storing.
+- Validate game IDs against known game lists before processing.
+- Sanitize any user-generated text before displaying.
 
-```typescript
-// Example: Always validate game IDs
-.input(z.object({
-  game: z.string().refine(g => VALID_GAMES.includes(g)),
-  score: z.number().int().min(0),
-}))
-```
+### 3.3 localStorage Best Practices
 
-### 3.3 Database Security
-
-- Use Drizzle ORM for all queries — never construct raw SQL strings.
-- Parameterize all dynamic values through Drizzle's query builder.
-- Never store file bytes in database columns — use S3 for file storage, database for metadata.
-- Use `ssl: { rejectUnauthorized: true }` for remote database connections.
-
-### 3.4 API Security Checklist
-
-- All traffic over HTTPS (enforced by deployment platform).
-- Rate limiting on score submission and authentication endpoints.
-- No sensitive data in URL parameters — use request body for mutations.
-- CORS configured to allow only the application origin.
-- Environment variables for all secrets — never commit `.env` files.
-- Server-side API keys (`BUILT_IN_FORGE_API_KEY`) never exposed to the client.
-
-### 3.5 Common Vulnerabilities to Watch
-
-| Vulnerability | Prevention |
-|--------------|-----------|
-| XSS | React auto-escapes JSX. Never use `dangerouslySetInnerHTML`. |
-| SQL Injection | Drizzle ORM parameterizes all queries. Never use raw SQL. |
-| CSRF | Session cookies use `SameSite=Lax`. Mutations use POST via tRPC. |
-| Broken Auth | All protected procedures verify `ctx.user` before executing. |
-| Mass Assignment | Zod schemas whitelist allowed input fields explicitly. |
+- Always wrap `localStorage.getItem` / `JSON.parse` in try/catch.
+- Use a consistent key prefix (`pp_`) to avoid collisions with other apps.
+- Never store sensitive data in localStorage.
+- Handle quota exceeded errors gracefully.
 
 ---
 
@@ -226,15 +207,15 @@ Feature implementation order:
 
 | Layer | Tool | Scope |
 |-------|------|-------|
-| Unit/Integration | Vitest | Server procedures, shared logic, data validation |
+| Unit/Integration | Vitest | gameStore, shared logic, data validation |
 | Component | Vitest + Testing Library | React component rendering (future) |
 | E2E | Playwright (recommended) | Critical user journeys (future) |
 
 ### 4.2 Current Test Structure
 
-Tests live in `server/*.test.ts` and run with `pnpm test` (Vitest).
+Tests live in `client/src/lib/*.test.ts` and run with `pnpm test` (Vitest).
 
-**Naming convention:** `<feature>.test.ts` — e.g., `favorites-badges.test.ts`, `share-score.test.ts`.
+**Naming convention:** `<feature>.test.ts` — e.g., `gameStore.test.ts`.
 
 **Test organization:**
 ```typescript
@@ -251,18 +232,19 @@ describe("Feature Name", () => {
 
 | Must Test | How |
 |-----------|-----|
-| Input validation | Verify Zod schemas reject invalid data |
-| Business logic | Test shared functions (achievements, scoring, categories) |
+| Score management | Verify submit, retrieve, sort, and filter operations |
+| Achievement logic | Verify threshold checks and deduplication |
+| Favorites | Verify toggle, persistence, and retrieval |
 | Data integrity | Verify game IDs, category mappings, tutorial data completeness |
-| Edge cases | Empty arrays, boundary values, missing optional fields |
+| Edge cases | Corrupted localStorage, empty arrays, boundary values |
 
 ### 4.4 Testing Rules
 
 - **Every new feature must include tests** before delivery.
 - Tests must be independent — no shared mutable state between tests.
 - Use descriptive test names that explain the expected behavior.
+- Mock `localStorage` in test environment since Vitest runs in Node.
 - Run `pnpm test` before every checkpoint save.
-- Aim for coverage of all tRPC procedures and shared utility functions.
 
 ### 4.5 E2E Testing (Future)
 
@@ -271,8 +253,8 @@ When implementing E2E tests, follow these patterns:
 - Use **Playwright** with TypeScript.
 - Add `data-testid` attributes to key interactive elements.
 - Implement the **Page Object Model** for reusable page interactions.
-- Focus on critical user journeys: play a game → submit score → view leaderboard.
-- Isolate tests with fresh state — reset localStorage and database between runs.
+- Focus on critical user journeys: play a game → view score → check leaderboard.
+- Isolate tests with fresh state — clear localStorage between runs.
 - Use `test.describe.parallel` for independent test suites.
 
 ---
@@ -282,24 +264,22 @@ When implementing E2E tests, follow these patterns:
 ### File Touch Points for New Features
 
 ```
-1. drizzle/schema.ts      → Add/modify tables
-2. pnpm db:push            → Apply migrations
-3. server/db.ts            → Add query helpers
-4. server/routers.ts       → Add tRPC procedures
-5. client/src/pages/*.tsx  → Build UI
-6. server/*.test.ts        → Write tests
-7. pnpm test               → Verify
+1. shared/types.ts or gameStore.ts  → Add types/storage helpers
+2. client/src/hooks/*.ts            → Add custom hooks
+3. client/src/pages/*.tsx           → Build UI
+4. client/src/lib/*.test.ts         → Write tests
+5. pnpm test                        → Verify
 ```
 
 ### Key Commands
 
 | Command | Purpose |
 |---------|---------|
-| `pnpm dev` | Start development server |
-| `pnpm build` | Build for production |
+| `pnpm dev` | Start Vite development server |
+| `pnpm build` | Build static SPA for production |
+| `pnpm preview` | Preview production build locally |
 | `pnpm test` | Run all tests |
 | `pnpm check` | TypeScript type checking |
-| `pnpm db:push` | Generate and apply migrations |
 | `pnpm format` | Format code with Prettier |
 
 ---

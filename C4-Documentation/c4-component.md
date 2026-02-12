@@ -1,142 +1,126 @@
 # C4 Component Index — Pixel Playground
 
-## System Components
+## Overview
 
-| Component | Container | Description | Documentation |
-|-----------|-----------|-------------|---------------|
-| Game Engine | React SPA | 11 HTML5 Canvas game implementations with procedural sound | [c4-component-game-engine.md](./c4-component-game-engine.md) |
-| UI Shell | React SPA | Navigation, layouts, theming, and shared UI components | [c4-component-ui-shell.md](./c4-component-ui-shell.md) |
-| Data Client | React SPA | tRPC client, React Query, auth context, and state management | [c4-component-data-client.md](./c4-component-data-client.md) |
-| Auth Module | Express API | OAuth flow, JWT sessions, and user management | [c4-component-auth.md](./c4-component-auth.md) |
-| Game Data Module | Express API | Score submission, leaderboards, achievements, and favorites | [c4-component-game-data.md](./c4-component-game-data.md) |
-| Database Layer | Express API | Drizzle ORM schema, query helpers, and migrations | [c4-component-database.md](./c4-component-database.md) |
+All components exist within the single React SPA container. The application is organized into pages, reusable components, hooks, data modules, and a shared layer. There are no server-side components.
 
-## Component Relationships
+## Component Diagram
 
-```mermaid
-graph TB
-    subgraph "React SPA"
-        GE[Game Engine<br/>11 Canvas Games]
-        UI[UI Shell<br/>Nav, Layout, Theme]
-        DC[Data Client<br/>tRPC, Auth Context]
-    end
-
-    subgraph "Express API"
-        AM[Auth Module<br/>OAuth, JWT]
-        GD[Game Data Module<br/>Scores, Achievements]
-        DB[Database Layer<br/>Drizzle ORM]
-    end
-
-    subgraph "External"
-        MySQL[(MySQL/TiDB)]
-        S3[(AWS S3)]
-        OAuth[Manus OAuth]
-    end
-
-    GE -->|score events| DC
-    UI -->|renders| GE
-    UI -->|reads state| DC
-    DC -->|tRPC calls| AM
-    DC -->|tRPC calls| GD
-    AM -->|queries| DB
-    GD -->|queries| DB
-    DB -->|SQL| MySQL
-    GD -->|files| S3
-    AM -->|OAuth flow| OAuth
 ```
-
----
+┌──────────────────────────────────────────────────────────────┐
+│                      React SPA                                │
+│                                                               │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │                    App.tsx (Router)                       │ │
+│  │  Wouter routes → ThemeProvider → Page components         │ │
+│  └──────────┬──────────────────────────────────┬───────────┘ │
+│             │                                  │              │
+│  ┌──────────▼──────────┐    ┌──────────────────▼───────────┐ │
+│  │    UI Pages (5)      │    │    Game Pages (11)            │ │
+│  │  Home, Leaderboard,  │    │  SnakeGame, TetrisGame,      │ │
+│  │  Achievements,       │    │  FlappyBirdGame, DinoGame,   │ │
+│  │  Profile, Settings   │    │  PongGame, SpaceInvadersGame,│ │
+│  │                      │    │  MinesweeperGame, Breakout,  │ │
+│  │                      │    │  Game2048, MemoryMatchGame,  │ │
+│  │                      │    │  WhackAMoleGame              │ │
+│  └──────────┬───────────┘    └──────────┬──────────────────┘ │
+│             │                           │                     │
+│  ┌──────────▼───────────────────────────▼──────────────────┐ │
+│  │              Shared Components                           │ │
+│  │  GameLayout, GameTutorial, ShareScore, NavBar            │ │
+│  └──────────┬──────────────────────────────────────────────┘ │
+│             │                                                 │
+│  ┌──────────▼──────────┐    ┌──────────────────────────────┐ │
+│  │     Hooks            │    │     Data / Services          │ │
+│  │  useScoreSubmit      │    │  gameStore.ts (localStorage) │ │
+│  │  useSoundEngine      │    │  tutorialData.ts             │ │
+│  │                      │    │  achievements.ts             │ │
+│  └──────────────────────┘    └──────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────┘
+```
 
 ## Component Details
 
-### Game Engine (React SPA)
+### Game Engine Layer
 
-**Purpose:** Implements all 11 arcade games as React components with HTML5 Canvas rendering and Web Audio API sound generation.
-
-**Sub-components:**
+**Purpose:** 11 HTML5 Canvas game implementations with procedural sound.
 
 | Game | File | Category | Controls |
 |------|------|----------|----------|
-| Snake | `SnakeGame.tsx` | Classic | Arrow keys / Swipe |
-| Flappy Bird | `FlappyBirdGame.tsx` | Action | Space / Tap |
-| Dino Jump | `DinoGame.tsx` | Action | Space / Tap |
-| Tetris | `TetrisGame.tsx` | Puzzle | Arrow keys / Swipe |
-| Pong | `PongGame.tsx` | Classic | Arrow keys / Drag |
-| Space Invaders | `SpaceInvadersGame.tsx` | Action | Arrow+Space / Tap |
-| Minesweeper | `MinesweeperGame.tsx` | Puzzle | Click / Tap |
-| Breakout | `BreakoutGame.tsx` | Classic | Arrow keys / Drag |
-| 2048 | `Game2048.tsx` | Puzzle | Arrow keys / Swipe |
-| Memory Match | `MemoryMatchGame.tsx` | Brain | Click / Tap |
-| Whack-a-Mole | `WhackAMoleGame.tsx` | Reflex | Click / Tap |
+| Snake | `pages/SnakeGame.tsx` | Classic | Arrow keys / Swipe |
+| Flappy Bird | `pages/FlappyBirdGame.tsx` | Action | Space / Tap |
+| Dino Jump | `pages/DinoGame.tsx` | Action | Space / Tap |
+| Tetris | `pages/TetrisGame.tsx` | Puzzle | Arrow keys / Buttons |
+| Pong | `pages/PongGame.tsx` | Classic | Arrow keys / Drag |
+| Space Invaders | `pages/SpaceInvadersGame.tsx` | Action | Arrow+Space / Buttons |
+| Minesweeper | `pages/MinesweeperGame.tsx` | Puzzle | Click / Tap |
+| Breakout | `pages/BreakoutGame.tsx` | Classic | Arrow keys / Drag |
+| 2048 | `pages/Game2048.tsx` | Puzzle | Arrow keys / Swipe |
+| Memory Match | `pages/MemoryMatchGame.tsx` | Brain | Click / Tap |
+| Whack-a-Mole | `pages/WhackAMoleGame.tsx` | Reflex | Click / Tap |
 
-**Shared infrastructure:**
-- `GameLayout.tsx` — Wrapper providing consistent nav, canvas sizing, and back navigation
-- `GameTutorial.tsx` — First-play tutorial overlay with controls and tips
-- `ShareScore.tsx` — Social sharing component for game-over screens
-- `tutorialData.ts` — Tutorial content definitions for all 11 games
-- `useSoundEngine` hook — Procedural 8-bit sound generation via Web Audio API
+**Common game page structure:**
+```
+GameLayout wrapper → Canvas element → Game loop (requestAnimationFrame)
+  ├── GameTutorial (first-play overlay, localStorage-persisted)
+  ├── ShareScore (game-over social sharing)
+  └── useScoreSubmit (score → gameStore → achievement check)
+```
 
-### UI Shell (React SPA)
+### UI Pages
 
-**Purpose:** Provides the application shell — navigation, routing, theming, and reusable UI components.
+| Component | File | Purpose | Key Dependencies |
+|-----------|------|---------|-----------------|
+| Home | `pages/Home.tsx` | Game catalog with search, category filter, favorites tab, NEW/HOT badges | gameStore, Framer Motion |
+| Leaderboard | `pages/Leaderboard.tsx` | Per-game score rankings from localStorage | gameStore |
+| Achievements | `pages/Achievements.tsx` | Achievement badge collection with progress tracking | gameStore, achievements.ts |
+| Profile | `pages/Profile.tsx` | Player stats, play history, achievement summary | gameStore |
+| Settings | `pages/Settings.tsx` | Difficulty, sound, theme, tutorial reset | localStorage |
 
-**Key files:**
-- `App.tsx` — Route definitions and ThemeProvider wrapper
-- `main.tsx` — tRPC/QueryClient providers and auth redirect logic
-- `Home.tsx` — Game catalog with search, category filters, favorites tab, and badges
-- `Leaderboard.tsx` — Per-game score rankings
-- `Achievements.tsx` — Achievement gallery with unlock progress
-- `Profile.tsx` — User stats, game history, and achievement showcase
-- `Settings.tsx` — Theme, sound, difficulty, and tutorial reset controls
-- `index.css` — Design tokens (colors, fonts, spacing) in CSS custom properties
+### Shared Components
 
-**UI library:** shadcn/ui components (`Button`, `Card`, `Dialog`, `Select`, `Slider`, `Tabs`, `Toast`)
+| Component | File | Purpose |
+|-----------|------|---------|
+| GameLayout | `components/GameLayout.tsx` | Responsive game wrapper with back button, score display, canvas container |
+| GameTutorial | `components/GameTutorial.tsx` | First-play tutorial overlay with controls and tips |
+| ShareScore | `components/ShareScore.tsx` | Social sharing buttons (Twitter/X, Facebook, Copy Link) |
+| NavBar | (in Home.tsx) | Sticky top navigation with game count and settings link |
 
-### Data Client (React SPA)
+### Hooks
 
-**Purpose:** Manages all client-server communication and client-side state.
+| Hook | File | Purpose |
+|------|------|---------|
+| useScoreSubmit | `hooks/useScoreSubmit.ts` | Submits scores to localStorage, checks achievements |
+| useSoundEngine | `hooks/useSoundEngine.ts` | Procedural 8-bit sound via Web Audio API |
 
-**Key files:**
-- `lib/trpc.ts` — tRPC React Query client binding
-- `hooks/useAuth.ts` — Authentication state hook (user, loading, logout)
-- `const.ts` — Login URL builder with state encoding
-- `contexts/ThemeContext.tsx` — Theme state (dark/light/system)
+### Data / Services
 
-**Patterns:**
-- All API calls via `trpc.*.useQuery()` / `trpc.*.useMutation()`
-- Optimistic updates for favorites toggle
-- Cache invalidation on score submission and achievement unlock
+| Module | File | Purpose |
+|--------|------|---------|
+| gameStore | `lib/gameStore.ts` | Centralized localStorage service for all persistent data |
+| tutorialData | `data/tutorialData.ts` | Tutorial content (controls, tips) for all 11 games |
+| achievements | `shared/achievements.ts` | Achievement definitions and threshold check logic |
 
-### Auth Module (Express API)
+### gameStore API
 
-**Purpose:** Handles the complete authentication lifecycle — OAuth callback, JWT session management, and user creation/lookup.
+| Function | Description |
+|----------|-------------|
+| `submitScore(game, score, playerName, extra?)` | Save a score entry |
+| `getScores(game?)` | Get scores, optionally filtered by game |
+| `getTopScores(game, limit)` | Get top N scores for a game |
+| `getBestScore(game)` | Get personal best for a game |
+| `getGamesPlayed()` | Get list of unique games played |
+| `getFavorites()` | Get favorited game IDs |
+| `toggleFavorite(gameId)` | Add or remove a favorite |
+| `isFavorite(gameId)` | Check if a game is favorited |
+| `getAchievements()` | Get all unlocked achievements |
+| `unlockAchievement(id, game)` | Unlock an achievement |
+| `getPlayerName() / setPlayerName()` | Get/set player display name |
 
-**Key files:**
-- `server/_core/oauth.ts` — OAuth callback handler, state parsing, token exchange
-- `server/_core/context.ts` — Request context builder (extracts user from JWT cookie)
-- `server/_core/cookies.ts` — Session cookie configuration
-- `server/_core/trpc.ts` — `publicProcedure` and `protectedProcedure` definitions
+## Related Documentation
 
-**Flow:** OAuth redirect → callback → JWT cookie → context injection → `ctx.user` in procedures
-
-### Game Data Module (Express API)
-
-**Purpose:** Business logic for scores, achievements, and favorites — exposed as tRPC procedures.
-
-**Key files:**
-- `server/routers.ts` — tRPC router with leaderboard, achievements, and favorites procedures
-- `shared/achievements.ts` — Achievement definition catalog and check logic
-
-**Procedures:** 14 tRPC procedures (see Container documentation for full API list)
-
-### Database Layer (Express API)
-
-**Purpose:** Schema definitions, query helpers, and migration management.
-
-**Key files:**
-- `drizzle/schema.ts` — Table definitions (users, scores, achievements, favorites)
-- `drizzle/relations.ts` — Table relationship definitions
-- `server/db.ts` — Query helper functions (submitScore, getTopScores, getUserFavorites, etc.)
-- `server/storage.ts` — S3 storage helpers (storagePut, storageGet)
-
-**ORM:** Drizzle ORM with mysql2 driver, migrations via `drizzle-kit`
+| Document | Path |
+|----------|------|
+| System Context | [c4-context.md](./c4-context.md) |
+| Container Diagram | [c4-container.md](./c4-container.md) |
+| Design System | [../DESIGN.md](../DESIGN.md) |

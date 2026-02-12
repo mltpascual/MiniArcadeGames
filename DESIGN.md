@@ -232,10 +232,10 @@ All semantic colors (`--background`, `--foreground`, `--card`, etc.) are defined
 ## 9. Feature Components
 
 ### Favorites System
-- **Database-backed:** Favorites stored in a `favorites` table with user-game association.
+- **localStorage-backed:** Favorites stored in the browser's localStorage via the gameStore service.
 - **Star toggle:** Heart icon on each game card, positioned over the card image. Filled accent color when favorited, semi-transparent outline when not.
-- **Filter tab:** "FAVS" tab in the category filter row, only visible to authenticated users. Shows favorited games or an empty state with a message prompting the user to star games.
-- **Optimistic updates:** Star toggle uses tRPC optimistic mutations for instant feedback.
+- **Filter tab:** "FAVS" tab in the category filter row. Shows favorited games or an empty state with a message prompting the user to star games.
+- **Instant feedback:** Star toggle updates localStorage and re-renders immediately.
 
 ### Game Tutorials
 - **First-play overlay:** Shows on first visit to each game. Dismissed via button, ESC, Enter, or backdrop click.
@@ -249,6 +249,10 @@ All semantic colors (`--background`, `--foreground`, `--card`, etc.) are defined
 - **High score indicator:** Adds a trophy emoji and "NEW HIGH SCORE!" text when the player beats their personal best.
 
 ### Leaderboard & Achievements
-- **Leaderboard:** Per-game score rankings with player names and timestamps.
-- **Achievements:** Unlockable badges for gameplay milestones (first game, high scores, streaks, etc.).
-- **Profile:** Player statistics, achievement showcase, and game history.
+- **Leaderboard:** Per-game score rankings stored in localStorage with player names and timestamps.
+- **Achievements:** Unlockable badges for gameplay milestones (first game, high scores, streaks, etc.), tracked in localStorage.
+- **Profile:** Player statistics, achievement showcase, and game history — all derived from localStorage data.
+
+## 10. Architecture Note
+
+Pixel Playground is a **fully client-side static SPA** with zero server dependencies. All data (scores, achievements, favorites, settings, tutorial state) is persisted in the browser's localStorage via a centralized `gameStore` service. The application can be deployed to any static hosting provider (Vercel, Netlify, GitHub Pages) as plain HTML/CSS/JS files. No database, no API server, no authentication service is required at runtime.
