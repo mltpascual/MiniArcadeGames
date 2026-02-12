@@ -2,10 +2,8 @@ import { useMemo } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft, Trophy, Lock, Sparkles } from "lucide-react";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
 import { ACHIEVEMENT_DEFS, type AchievementDef } from "../../../shared/achievements";
-import { getLoginUrl } from "@/const";
+import { getUnlockedAchievements } from "@/lib/gameStore";
 
 const GAME_LABELS: Record<string, string> = {
   snake: "Snake",
@@ -14,6 +12,11 @@ const GAME_LABELS: Record<string, string> = {
   tetris: "Tetris",
   pong: "Pong",
   "space-invaders": "Space Invaders",
+  minesweeper: "Minesweeper",
+  breakout: "Breakout",
+  "2048": "2048",
+  "memory-match": "Memory Match",
+  "whack-a-mole": "Whack-a-Mole",
   global: "Global",
 };
 
@@ -24,6 +27,11 @@ const GAME_COLORS: Record<string, string> = {
   tetris: "#f97316",
   pong: "#4ade80",
   "space-invaders": "#818cf8",
+  minesweeper: "#4ade80",
+  breakout: "#f97316",
+  "2048": "#818cf8",
+  "memory-match": "#f97316",
+  "whack-a-mole": "#4ade80",
   global: "#facc15",
 };
 
@@ -34,7 +42,7 @@ function AchievementCard({
 }: {
   def: AchievementDef;
   unlocked: boolean;
-  unlockedAt?: Date;
+  unlockedAt?: number;
 }) {
   const color = GAME_COLORS[def.game] || "#888";
 
@@ -92,18 +100,12 @@ function AchievementCard({
 }
 
 export default function Achievements() {
-  const { user } = useAuth();
-  const { data: userAchievements, isLoading } = trpc.achievements.getMyAchievements.useQuery(
-    undefined,
-    { enabled: !!user }
-  );
+  const userAchievements = useMemo(() => getUnlockedAchievements(), []);
 
   const unlockedSet = useMemo(() => {
-    const set = new Map<string, Date>();
-    if (userAchievements) {
-      for (const a of userAchievements) {
-        set.set(a.achievementId, a.unlockedAt);
-      }
+    const set = new Map<string, number>();
+    for (const a of userAchievements) {
+      set.set(a.achievementId, a.unlockedAt);
     }
     return set;
   }, [userAchievements]);
@@ -144,48 +146,22 @@ export default function Achievements() {
 
       <div className="container py-4 sm:py-8">
         {/* Progress bar */}
-        {user && (
-          <div className="mb-6 p-4 rounded-xl bg-card border border-border/50">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-foreground">
-                {unlockedCount} / {totalCount} Achievements
-              </span>
-              <span className="text-sm font-mono text-muted-foreground">{progressPct}%</span>
-            </div>
-            <div className="h-3 bg-muted rounded-full overflow-hidden">
-              <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-yellow-400 to-amber-500"
-                initial={{ width: 0 }}
-                animate={{ width: `${progressPct}%` }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              />
-            </div>
+        <div className="mb-6 p-4 rounded-xl bg-card border border-border/50">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-semibold text-foreground">
+              {unlockedCount} / {totalCount} Achievements
+            </span>
+            <span className="text-sm font-mono text-muted-foreground">{progressPct}%</span>
           </div>
-        )}
-
-        {/* Not logged in */}
-        {!user && (
-          <div className="mb-6 p-6 rounded-xl bg-card border border-border/50 text-center">
-            <Trophy className="w-10 h-10 text-yellow-400 mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground mb-3">
-              Log in to track your achievements and earn badges!
-            </p>
-            <a
-              href={getLoginUrl()}
-              className="inline-block px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity"
-            >
-              Log In
-            </a>
+          <div className="h-3 bg-muted rounded-full overflow-hidden">
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-yellow-400 to-amber-500"
+              initial={{ width: 0 }}
+              animate={{ width: `${progressPct}%` }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            />
           </div>
-        )}
-
-        {/* Loading */}
-        {user && isLoading && (
-          <div className="py-16 text-center">
-            <Trophy className="w-8 h-8 text-muted-foreground mx-auto mb-3 animate-pulse" />
-            <p className="text-sm text-muted-foreground">Loading achievements...</p>
-          </div>
-        )}
+        </div>
 
         {/* Achievement groups */}
         {Array.from(grouped.entries()).map(([game, defs]) => (

@@ -5,13 +5,11 @@
  * - Responsive grid game cards — 1 col mobile, 2 col tablet, 3 col desktop
  * - Silkscreen pixel font for headings, Outfit for body
  */
-import { useAuth } from "@/_core/hooks/useAuth";
 import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
 import { Gamepad2, Zap, Settings, Trophy, Award, User, Search, X, Star, Flame, Sparkles } from "lucide-react";
-import { trpc } from "@/lib/trpc";
-import { getLoginUrl } from "@/const";
+import { getFavorites, toggleFavorite as storeToggleFavorite, getGamePlayCounts } from "@/lib/gameStore";
 
 const HERO_IMG = "https://private-us-east-1.manuscdn.com/sessionFile/47LZSGYqN22BYCYAxPiaxL/sandbox/2gvGaXiIcbq5AtvP2rclMh-img-1_1770800508000_na1fn_aGVyby1hcmNhZGU.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvNDdMWlNHWXFOMjJCWUNZQXhQaWF4TC9zYW5kYm94LzJndkdhWGlJY2JxNUF0dlAycmNsTWgtaW1nLTFfMTc3MDgwMDUwODAwMF9uYTFmbl9hR1Z5YnkxaGNtTmhaR1UucG5nP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTkyMCxoXzE5MjAvZm9ybWF0LHdlYnAvcXVhbGl0eSxxXzgwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=nTbEBvwm5ChOvub7wedCQMyEBwIAY9Yq6ObAudIcHubjRSNUGOF89zeR6Ao20c7Er100ntL-zXZOOBUy1NhIx9AHVwmtCye7YSJZ2Jo4SQuAdgY5O~H6Mo08PhHf8Eebxu8v33ynfQggloMlk9cDoxQKd4nmxE-0lApXya4BsIaiy56QlGU0NZotn189Odye82Zs14FwXhx6b6EcqLXBuS-LlrJhVPrJcIk8BpOT4TWAV~uHebM-cDwvwqZb~BrmrbN7EMHoLTv4IB5hM9BVeOr10e96vW3uVOaaBboj5-PJ4W49jCIfBD3L7tOnljZDcPt0fLvP3dLXbfaS5JJTFg__";
 
@@ -232,58 +230,29 @@ const itemVariants = {
 };
 
 export default function Home() {
-  const { user, isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [favVersion, setFavVersion] = useState(0);
 
-  // Favorites: only fetch if logged in
-  const favoritesQuery = trpc.favorites.getMyFavorites.useQuery(undefined, {
-    enabled: isAuthenticated,
-    staleTime: 30_000,
-  });
-  const favoriteGameIds = useMemo(() => new Set(favoritesQuery.data ?? []), [favoritesQuery.data]);
+  // Favorites from localStorage
+  const favoriteGameIds = useMemo(() => new Set(getFavorites()), [favVersion]);
 
-  const utils = trpc.useUtils();
-  const toggleFavorite = trpc.favorites.toggle.useMutation({
-    onMutate: async ({ gameId }) => {
-      await utils.favorites.getMyFavorites.cancel();
-      const prev = utils.favorites.getMyFavorites.getData() ?? [];
-      const isFav = prev.includes(gameId);
-      utils.favorites.getMyFavorites.setData(undefined,
-        isFav ? prev.filter(id => id !== gameId) : [...prev, gameId]
-      );
-      return { prev };
-    },
-    onError: (_err, _vars, ctx) => {
-      if (ctx?.prev) utils.favorites.getMyFavorites.setData(undefined, ctx.prev);
-    },
-    onSettled: () => {
-      utils.favorites.getMyFavorites.invalidate();
-    },
-  });
-
-  // Game play counts for HOT badge
-  const playCountsQuery = trpc.gameStats.getPlayCounts.useQuery(undefined, {
-    staleTime: 60_000,
-  });
+  // Game play counts for HOT badge from localStorage
   const hotGameIds = useMemo(() => {
-    const counts = playCountsQuery.data ?? [];
+    const counts = getGamePlayCounts();
     const hot = new Set<string>();
-    for (const c of counts) {
-      if (c.totalPlays >= HOT_PLAY_THRESHOLD) hot.add(c.game);
+    for (const [game, plays] of Object.entries(counts)) {
+      if (plays >= HOT_PLAY_THRESHOLD) hot.add(game);
     }
     return hot;
-  }, [playCountsQuery.data]);
+  }, [favVersion]);
 
   const handleToggleFavorite = useCallback((e: React.MouseEvent, backendId: string) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!isAuthenticated) {
-      window.location.href = getLoginUrl();
-      return;
-    }
-    toggleFavorite.mutate({ gameId: backendId as any });
-  }, [isAuthenticated, toggleFavorite]);
+    storeToggleFavorite(backendId);
+    setFavVersion((v) => v + 1);
+  }, []);
 
   const filteredGames = useMemo(() => {
     return games.filter((game) => {
@@ -467,7 +436,7 @@ export default function Home() {
               </p>
               <p className="text-xs sm:text-sm text-muted-foreground/60">
                 {activeCategory === "favorites"
-                  ? (isAuthenticated ? "Star games to add them to your favorites!" : "Log in to save your favorite games")
+                  ? "Star games to add them to your favorites!"
                   : "Try a different search or category"}
               </p>
               <button

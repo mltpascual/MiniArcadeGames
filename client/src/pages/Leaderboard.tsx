@@ -2,8 +2,7 @@ import { useState, useMemo } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowLeft, Trophy, Crown, Medal, Award, Gamepad2 } from "lucide-react";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
+import { getTopScores, type ScoreEntry } from "@/lib/gameStore";
 
 const GAMES = [
   { id: "snake", label: "Snake", color: "#4ade80" },
@@ -28,12 +27,8 @@ function RankIcon({ rank }: { rank: number }) {
 
 export default function Leaderboard() {
   const [selectedGame, setSelectedGame] = useState<typeof GAMES[number]["id"]>("snake");
-  const { user } = useAuth();
 
-  const { data: scores, isLoading } = trpc.leaderboard.getTopScores.useQuery(
-    { game: selectedGame, limit: 20 },
-  );
-
+  const scores: ScoreEntry[] = useMemo(() => getTopScores(selectedGame, 20), [selectedGame]);
   const selectedGameInfo = useMemo(() => GAMES.find(g => g.id === selectedGame), [selectedGame]);
 
   return (
@@ -91,16 +86,8 @@ export default function Leaderboard() {
             <span className="hidden sm:block text-xs font-semibold text-muted-foreground uppercase text-right">Date</span>
           </div>
 
-          {/* Loading state */}
-          {isLoading && (
-            <div className="py-16 text-center">
-              <Gamepad2 className="w-8 h-8 text-muted-foreground mx-auto mb-3 animate-pulse" />
-              <p className="text-sm text-muted-foreground">Loading scores...</p>
-            </div>
-          )}
-
           {/* Empty state */}
-          {!isLoading && (!scores || scores.length === 0) && (
+          {scores.length === 0 && (
             <div className="py-16 text-center">
               <Trophy className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
               <p className="text-sm text-muted-foreground">No scores yet. Be the first to play!</p>
@@ -116,56 +103,41 @@ export default function Leaderboard() {
           )}
 
           {/* Score rows */}
-          {scores?.map((entry, index) => {
-            const isCurrentUser = user && entry.userId === user.id;
-            return (
-              <motion.div
-                key={entry.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.03 }}
-                className={`
-                  grid grid-cols-[3rem_1fr_auto] sm:grid-cols-[4rem_1fr_auto_auto] gap-2 sm:gap-4 px-4 sm:px-6 py-3 border-b border-border/20
-                  ${isCurrentUser ? "bg-primary/5" : "hover:bg-muted/20"}
-                  ${index < 3 ? "bg-muted/10" : ""}
-                  transition-colors
-                `}
-              >
-                <div className="flex items-center">
-                  <RankIcon rank={index + 1} />
-                </div>
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className={`text-sm truncate ${isCurrentUser ? "text-primary font-semibold" : "text-foreground"}`}>
-                    {entry.userName || "Anonymous"}
-                    {isCurrentUser && <span className="text-xs text-primary ml-1">(You)</span>}
-                  </span>
-                </div>
-                <div className="flex items-center justify-end">
-                  <span
-                    className="font-mono text-sm font-bold"
-                    style={{ color: selectedGameInfo?.color }}
-                  >
-                    {entry.score.toLocaleString()}
-                  </span>
-                </div>
-                <div className="hidden sm:flex items-center justify-end">
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(entry.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-              </motion.div>
-            );
-          })}
+          {scores.map((entry: ScoreEntry, index: number) => (
+            <motion.div
+              key={entry.id}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.03 }}
+              className={`
+                grid grid-cols-[3rem_1fr_auto] sm:grid-cols-[4rem_1fr_auto_auto] gap-2 sm:gap-4 px-4 sm:px-6 py-3 border-b border-border/20
+                hover:bg-muted/20
+                ${index < 3 ? "bg-muted/10" : ""}
+                transition-colors
+              `}
+            >
+              <div className="flex items-center">
+                <RankIcon rank={index + 1} />
+              </div>
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-sm truncate text-foreground">You</span>
+              </div>
+              <div className="flex items-center justify-end">
+                <span
+                  className="font-mono text-sm font-bold"
+                  style={{ color: selectedGameInfo?.color }}
+                >
+                  {entry.score.toLocaleString()}
+                </span>
+              </div>
+              <div className="hidden sm:flex items-center justify-end">
+                <span className="text-xs text-muted-foreground">
+                  {new Date(entry.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+            </motion.div>
+          ))}
         </motion.div>
-
-        {/* Login prompt */}
-        {!user && (
-          <div className="mt-6 p-4 rounded-xl bg-card border border-border/50 text-center">
-            <p className="text-sm text-muted-foreground mb-2">
-              Log in to submit your scores and compete on the leaderboard!
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );

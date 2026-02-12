@@ -49,3 +49,10 @@
 - [x] Run dev-orchestrator: create DEVELOPMENT_GUIDELINES.md
 - [x] Run docs-orchestrator: create conductor/, update DESIGN.md, create C4-Documentation/, update README.md
 - [x] Deploy code to GitHub (mltpascual/MiniArcadeGames)
+- [x] Convert to client-side only: remove Express server, tRPC, database, OAuth
+- [x] Create localStorage services for scores, favorites, achievements, settings
+- [x] Update all pages/components to use localStorage instead of tRPC hooks
+- [x] Update vite.config, package.json for static SPA build
+- [x] Write tests for localStorage services
+- [ ] Run master orchestrator (dev + docs) on converted project
+- [ ] Deploy converted project to GitHub
