@@ -57,3 +57,5 @@
 - [x] Run master orchestrator (dev + docs) on converted project
 - [x] Deploy converted project to GitHub
 - [x] Extract logo and create favicon (+ apple-touch-icon, web manifest, OG meta tags)
+- [x] Add JSON-LD structured data (WebApplication + VideoGame schema) for SEO
+- [x] Migrate all 12 Manus CDN images to local repo (client/public/images/)
